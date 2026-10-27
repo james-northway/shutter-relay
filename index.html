@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17151A">
+<title>Shutter Relay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+  :root {
+    --bg: #FAF7F2;
+    --surface: #FFFFFF;
+    --surface-2: #F1ECE3;
+    --border: #E4DDD0;
+    --text: #211E1A;
+    --text-dim: #6B655C;
+    --accent: #D9661C;
+    --accent-text: #FFFFFF;
+    --accent-soft: #F7E4D3;
+    --success: #2F7D5C;
+    --success-soft: #DCEEE5;
+    --danger: #C23B33;
+    --danger-soft: #F6DEDB;
+    --shadow: rgba(33,30,26,0.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17151A;
+      --surface: #221F24;
+      --surface-2: #2B272E;
+      --border: #3A353D;
+      --text: #F3EEE6;
+      --text-dim: #A79E92;
+      --accent: #FF8A3D;
+      --accent-text: #1A1108;
+      --accent-soft: #3A2513;
+      --success: #6FCB9F;
+      --success-soft: #1D3A2C;
+      --danger: #FF6B62;
+      --danger-soft: #3D1E1C;
+      --shadow: rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17151A;
+    --surface: #221F24;
+    --surface-2: #2B272E;
+    --border: #3A353D;
+    --text: #F3EEE6;
+    --text-dim: #A79E92;
+    --accent: #FF8A3D;
+    --accent-text: #1A1108;
+    --accent-soft: #3A2513;
+    --success: #6FCB9F;
+    --success-soft: #1D3A2C;
+    --danger: #FF6B62;
+    --danger-soft: #3D1E1C;
+    --shadow: rgba(0,0,0,0.55);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  .app {
+    width: 100%;
+    max-width: 460px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    position: relative;
+  }
+  @media (min-width: 520px) {
+    .app {
+      min-height: 92vh;
+      margin: 4vh 0;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: 0 24px 60px var(--shadow);
+      overflow: hidden;
+    }
+  }
+
+  h1, h2, h3 { font-family: 'Big Shoulders Display', system-ui, sans-serif; margin: 0; text-wrap: balance; }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+  header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .eyebrow-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .gear-btn {
+    background: none; border: none; color: var(--text-dim); font-size: 15px;
+    cursor: pointer; padding: 4px 6px; border-radius: 8px;
+  }
+  .gear-btn:hover { background: var(--surface-2); }
+  .event-name {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.05;
+    margin-top: 4px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    width: 100%;
+    padding: 2px 0;
+    font-family: 'Big Shoulders Display', system-ui, sans-serif;
+  }
+  .event-name:focus { outline: none; border-bottom: 2px solid var(--accent); }
+  .event-name:disabled { color: var(--text); opacity: 1; -webkit-text-fill-color: var(--text); }
+  .status-row {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 4px;
+    gap: 14px;
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  .status-row b { color: var(--text); font-weight: 600; }
+
+  main { flex: 1; overflow-y: auto; padding: 16px 20px 20px; }
+
+  .hint {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text-dim);
+  }
+  .hint strong { color: var(--text); }
+  .hint ol, .hint ul { margin: 8px 0 0; padding-left: 18px; }
+  .hint li { margin-bottom: 4px; }
+
+  .field-label {
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-dim); margin: 16px 0 6px;
+  }
+  .field-label:first-child { margin-top: 0; }
+
+  .btn {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    border-radius: 12px;
+    padding: 13px 18px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-accent { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .btn-block { width: 100%; }
+  .btn-ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
+  .btn-danger-ghost { background: transparent; border-color: transparent; color: var(--danger); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-row { display: flex; gap: 10px; }
+
+  input[type="text"], input[type="search"], input[type="password"], select {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    width: 100%;
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  select { appearance: none; -webkit-appearance: none; background-image: none; }
+
+  .guest-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    margin-bottom: 8px;
+  }
+  .guest-thumb {
+    width: 44px; height: 44px;
+    border-radius: 8px;
+    background: #fff;
+    padding: 3px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+  .guest-thumb img { width: 100%; height: 100%; object-fit: contain; }
+  .guest-info { flex: 1; min-width: 0; }
+  .guest-label { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chip {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-top: 3px;
+    font-weight: 500;
+  }
+  .chip-pending { background: var(--accent-soft); color: var(--accent); }
+  .chip-shown { background: var(--success-soft); color: var(--success); }
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    font-size: 15px;
+  }
+  .icon-btn:active { transform: scale(0.94); }
+
+  .empty-state { text-align: center; padding: 40px 10px; color: var(--text-dim); }
+  .empty-state .big-emoji { font-size: 34px; margin-bottom: 8px; }
+
+  .spotlight-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 6px; }
+  .ticket {
+    width: 100%; max-width: 300px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px var(--shadow);
+    overflow: hidden;
+  }
+  .ticket-stub { padding: 18px 20px 14px; text-align: center; }
+  .ticket-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+  .ticket-label { font-size: 34px; font-weight: 800; line-height: 1.05; margin-top: 2px; }
+  .ticket-perf { height: 0; border-top: 2px dashed var(--border); position: relative; }
+  .ticket-perf::before, .ticket-perf::after {
+    content: ""; position: absolute; top: -9px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg);
+  }
+  .ticket-perf::before { left: -9px; }
+  .ticket-perf::after { right: -9px; }
+  .ticket-qr { background: #ffffff; padding: 22px; display: flex; align-items: center; justify-content: center; }
+  .ticket-qr img { width: 100%; max-width: 220px; display: block; }
+  .progress-line { margin-top: 16px; font-size: 12.5px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; }
+  .spotlight-actions { width: 100%; max-width: 300px; margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+  .photo-cell { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .photo-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-cell .badge {
+    position: absolute; top: 5px; left: 5px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 999px; font-weight: 600;
+  }
+  .badge-new { background: var(--accent); color: var(--accent-text); }
+  .badge-sent { background: var(--success); color: #fff; }
+  .badge-err { background: var(--danger); color: #fff; }
+  .photo-cell .spin {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.45); color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  }
+  .send-summary { font-size: 13px; color: var(--text-dim); margin-top: 12px; }
+  .send-msg { margin-top: 12px; padding: 12px 14px; border-radius: 12px; font-size: 13.5px; line-height: 1.5; }
+  .send-msg.ok { background: var(--success-soft); color: var(--success); }
+  .send-msg.err { background: var(--danger-soft); color: var(--danger); }
+
+  nav.tabbar {
+    display: flex; border-top: 1px solid var(--border); background: var(--surface);
+    flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tab {
+    flex: 1; background: none; border: none; padding: 10px 4px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--text-dim); cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; min-height: 56px;
+  }
+  .tab .tab-icon { font-size: 19px; }
+  .tab .tab-label { font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+  .tab.active { color: var(--accent); }
+
+  .hidden { display: none !important; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+  a.link { color: var(--accent); text-decoration: none; font-weight: 600; }
+  a.link:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="eyebrow-row">
+      <div class="eyebrow"><span class="dot"></span> Shutter Relay</div>
+      <button class="gear-btn" id="settingsBtn" aria-label="Zenfolio connection settings">⚙</button>
+    </div>
+    <input class="event-name" id="eventName" type="text" value="Untitled Event" aria-label="Event name" />
+    <div class="status-row" id="statusRow"></div>
+  </header>
+
+  <main id="main"></main>
+
+  <nav class="tabbar">
+    <button class="tab" data-tab="guests"><span class="tab-icon">📋</span><span class="tab-label">Guests</span></button>
+    <button class="tab" data-tab="next"><span class="tab-icon">🎫</span><span class="tab-label">Next Up</span></button>
+    <button class="tab" data-tab="send"><span class="tab-icon">📤</span><span class="tab-label">Send Photos</span></button>
+  </nav>
+</div>
+
+<input type="file" id="photoFileInput" accept="image/*" multiple class="visually-hidden" aria-label="Select photos to send" />
+<div id="qrScratch" style="position:absolute; left:-9999px; top:-9999px;"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "shutterRelay.v2";
+  var API_BASE = "https://app.zenfolio.com/api/public-api/v1.0";
+  var ROOT_FOLDER_ID = "861489fd-b582-4805-8be8-81775bf91cd4";
+  var HIDDEN_PRESET_ID = "984a2467-e1d9-4990-8994-f11d20c221d7";
+  var GALLERY_URL_BASE = "https://www.jnorthway.com/galleries/";
+
+  var SHOOT_TYPES = [
+    { id: 31, name: "Anniversary" }, { id: 32, name: "Baby Shower" }, { id: 45, name: "Bar/Bat Mitzvah" },
+    { id: 33, name: "Birthday" }, { id: 34, name: "Bridal" }, { id: 35, name: "Concert" },
+    { id: 36, name: "Corporate" }, { id: 37, name: "Graduation" }, { id: 44, name: "Party" },
+    { id: 38, name: "Prom" }, { id: 39, name: "Religious" }, { id: 40, name: "Reunion" },
+    { id: 41, name: "School" }, { id: 43, name: "Sport" }, { id: 46, name: "Theater" }
+  ];
+
+  var NETWORK_ERROR = "Couldn't reach Zenfolio. Check your signal. If this page is open inside Claude, open the hosted copy in Chrome instead (Claude's viewer blocks calls to Zenfolio).";
+
+  var state = loadState();
+  var pendingPhotoFiles = [];
+  var photoObjectUrls = [];
+
+  function defaultState() {
+    return {
+      appKey: "",
+      userKey: "",
+      eventName: "Untitled Event",
+      eventFolderId: null,
+      shootTypeId: 44,
+      activeTab: "guests",
+      guests: [],          // {id, galleryId, alias, url, label, status:'pending'|'shown', photoCount, qrDataUrl}
+      currentGuestId: null,
+      lastSyncAt: null
+    };
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return defaultState();
+      return Object.assign(defaultState(), JSON.parse(raw));
+    } catch (e) { return defaultState(); }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* private mode / quota */ }
+  }
+
+  function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function apiHeaders(extra) {
+    var h = { "X-Application-API-Key": state.appKey, "X-User-API-Key": state.userKey };
+    if (extra) for (var k in extra) h[k] = extra[k];
+    return h;
+  }
+
+  async function apiRequestJson(method, path, body) {
+    var opts = { method: method, headers: apiHeaders({ "Content-Type": "application/json" }) };
+    if (body !== undefined) opts.body = JSON.stringify(body);
+    var res;
+    try {
+      res = await fetch(API_BASE + path, opts);
+    } catch (e) {
+      throw new Error(NETWORK_ERROR);
+    }
+    var text = await res.text();
+    var data = null;
+    try { data = text ? JSON.parse(text) : null; } catch (e) { /* non-JSON */ }
+    if (!res.ok) {
+      var msg = (data && (data.title || data.type)) || ("HTTP " + res.status);
+      if (res.status === 401) msg = "Zenfolio rejected your API keys (check ⚙ settings)";
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  function generateQrDataUrl(text, size) {
+    var scratch = document.getElementById("qrScratch");
+    scratch.innerHTML = "";
+    new QRCode(scratch, { text: text, width: size || 240, height: size || 240, correctLevel: QRCode.CorrectLevel.M });
+    var canvas = scratch.querySelector("canvas");
+    var dataUrl = canvas ? canvas.toDataURL("image/png") : "";
+    scratch.innerHTML = "";
+    return dataUrl;
+  }
+
+  // ---------- Header ----------
+  var eventNameInput = document.getElementById("eventName");
+  eventNameInput.value = state.eventName;
+  eventNameInput.addEventListener("change", function () {
+    state.eventName = eventNameInput.value.trim() || "Untitled Event";
+    saveState();
+  });
+  document.getElementById("settingsBtn").addEventListener("click", function () {
+    state.activeTab = "settings";
+    saveState();
+    render();
+  });
+
+  function formatMinutesAgo(ts) {
+    if (!ts) return null;
+    var mins = Math.max(0, Math.round((Date.now() - ts) / 60000));
+    if (mins < 1) return "just now";
+    if (mins === 1) return "1 min ago";
+    if (mins < 60) return mins + " min ago";
+    var hrs = Math.floor(mins / 60);
+    return hrs + "h " + (mins % 60) + "m ago";
+  }
+
+  function renderStatusRow() {
+    if (!state.appKey || !state.userKey) {
+      document.getElementById("statusRow").innerHTML = '<span style="color:var(--danger);">Not connected to Zenfolio</span>';
+      return;
+    }
+    var pending = state.guests.filter(function (g) { return g.status === "pending"; }).length;
+    var totalPhotos = state.guests.reduce(function (s, g) { return s + (g.photoCount || 0); }, 0);
+    var syncMins = state.lastSyncAt ? Math.round((Date.now() - state.lastSyncAt) / 60000) : null;
+    var syncLabel = state.lastSyncAt ? formatMinutesAgo(state.lastSyncAt) : "no uploads yet";
+    var syncColor = (syncMins === null || syncMins < 20) ? "var(--text-dim)" : (syncMins < 40 ? "var(--accent)" : "var(--danger)");
+    document.getElementById("statusRow").innerHTML =
+      '<span><b>' + state.guests.length + '</b> guests</span>' +
+      '<span><b>' + pending + '</b> waiting</span>' +
+      '<span><b>' + totalPhotos + '</b> uploaded</span>' +
+      '<span style="color:' + syncColor + ';">Last upload: <b style="color:' + syncColor + ';">' + syncLabel + '</b></span>';
+  }
+
+  // ---------- Tabs ----------
+  var tabButtons = document.querySelectorAll(".tab");
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      state.activeTab = btn.getAttribute("data-tab");
+      saveState();
+      render();
+    });
+  });
+  function updateTabHighlight() {
+    tabButtons.forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-tab") === state.activeTab);
+    });
+  }
+
+  // ---------- Settings (Zenfolio connection) ----------
+  function renderSettingsTab(container) {
+    var wrap = document.createElement("div");
+    wrap.innerHTML =
+      '<div class="hint" style="margin-bottom:14px;">' +
+        'Paste the two keys from your Zenfolio Partner API Account (Application key) and the one-time connection screen (User key). ' +
+        'These are stored only in this browser — never published in the app\'s code.' +
+      '</div>' +
+      '<div class="field-label">Application API Key</div>' +
+      '<input type="password" id="appKeyInput" placeholder="Application API Key" value="' + escapeHtml(state.appKey) + '" />' +
+      '<div class="field-label">User API Key</div>' +
+      '<input type="password" id="userKeyInput" placeholder="User API Key" value="' + escapeHtml(state.userKey) + '" />' +
+      '<div class="btn-row" style="margin-top:16px;">' +
+        '<button class="btn btn-accent" id="saveKeysBtn" style="flex:1;">Save</button>' +
+        '<button class="btn" id="backFromSettingsBtn" style="flex:1;">Back</button>' +
+      '</div>' +
+      '<div id="settingsMsg"></div>';
+    container.innerHTML = "";
+    container.appendChild(wrap);
+
+    document.getElementById("saveKeysBtn").addEventListener("click", function () {
+      state.appKey = document.getElementById("appKeyInput").value.trim();
+      state.userKey = document.getElementById("userKeyInput").value.trim();
+      saveState();
+      document.getElementById("settingsMsg").innerHTML = '<div class="send-msg ok">Saved.</div>';
+    });
+    document.getElementById("backFromSettingsBtn").addEventListener("click", function () {
+      state.activeTab = "guests";
+      saveState();
+      render();
+    });
+  }
+
+  // ---------- Event setup (inside Guests tab, before an event folder exists) ----------
+  function renderEventSetup(container) {
+    var wrap = document.createElement("div");
+    var options = SHOOT_TYPES.map(function (t) {
+      return '<option value="' + t.id + '"' + (t.id === state.shootTypeId ? " selected" : "") + '>' + t.name + '</option>';
+    }).join("");
+    wrap.innerHTML =
+      '<div class="hint" style="margin-bottom:14px;">' +
+        '<strong>Start a new event:</strong> this creates a folder in your Zenfolio account, and every guest gallery you add below lives inside it, using your "Guest Gallery (Hidden)" preset.' +
+      '</div>' +
+      '<div class="field-label">Event type</div>' +
+      '<select id="shootTypeSelect">' + options + '</select>' +
+      '<button class="btn btn-accent btn-block" id="startEventBtn" style="margin-top:16px;">Start Event</button>' +
+      '<div id="eventSetupMsg"></div>';
+    container.innerHTML = "";
+    container.appendChild(wrap);
+
+    document.getElementById("shootTypeSelect").addEventListener("change", function (e) {
+      state.shootTypeId = parseInt(e.target.value, 10);
+      saveState();
+    });
+
+    document.getElementById("startEventBtn").addEventListener("click", async function () {
+      var btn = this;
+      var msg = document.getElementById("eventSetupMsg");
+      btn.disabled = true;
+      msg.innerHTML = '<div class="send-msg ok">Creating event folder…</div>';
+      try {
+        var resp = await apiRequestJson("POST", "/folder", { parentId: ROOT_FOLDER_ID, name: state.eventName });
+        state.eventFolderId = resp.id;
+        saveState();
+        render();
+      } catch (err) {
+        msg.innerHTML = '<div class="send-msg err">Couldn\'t create the event folder: ' + escapeHtml(err.message) + '</div>';
+        btn.disabled = false;
+      }
+    });
+  }
+
+  // ---------- Guests tab ----------
+  async function addGuest() {
+    var label = window.prompt("Guest or table name (used for the gallery and the label on their QR ticket):");
+    if (!label) return;
+    label = label.trim();
+    if (!label) return;
+    try {
+      var created = await apiRequestJson("POST", "/gallery", {
+        parentId: state.eventFolderId,
+        name: label,
+        presetId: HIDDEN_PRESET_ID,
+        shootTypeId: state.shootTypeId
+      });
+      var details = await apiRequestJson("GET", "/gallery/" + created.id, undefined);
+      var url = GALLERY_URL_BASE + details.alias;
+      state.guests.push({
+        id: uid(),
+        galleryId: created.id,
+        alias: details.alias,
+        url: url,
+        label: label,
+        status: "pending",
+        photoCount: 0,
+        qrDataUrl: generateQrDataUrl(url, 240)
+      });
+      saveState();
+      render();
+    } catch (err) {
+      alert("Couldn't create this guest's gallery: " + err.message);
+    }
+  }
+
+  function renderGuestsTab(container, filterText) {
+    var wrap = document.createElement("div");
+
+    if (!state.appKey || !state.userKey) {
+      wrap.innerHTML = '<div class="hint"><strong>Not connected yet.</strong> Tap ⚙ above and paste your Zenfolio API keys before starting an event.</div>';
+      container.innerHTML = "";
+      container.appendChild(wrap);
+      return;
+    }
+
+    if (!state.eventFolderId) {
+      renderEventSetup(container);
+      return;
+    }
+
+    var addRow = document.createElement("div");
+    addRow.className = "btn-row";
+    addRow.style.marginBottom = "14px";
+    addRow.innerHTML = '<button class="btn btn-accent btn-block" id="addGuestBtn">＋ Add Guest</button>';
+    wrap.appendChild(addRow);
+
+    if (state.guests.length === 0) {
+      var empty = document.createElement("div");
+      empty.className = "hint";
+      empty.innerHTML = 'Add your first guest — this creates their private gallery on Zenfolio automatically and generates their QR code, no import needed.';
+      wrap.appendChild(empty);
+      container.innerHTML = "";
+      container.appendChild(wrap);
+      document.getElementById("addGuestBtn").addEventListener("click", addGuest);
+      return;
+    }
+
+    var searchWrap = document.createElement("div");
+    searchWrap.style.marginBottom = "10px";
+    searchWrap.innerHTML = '<input type="search" id="guestSearch" placeholder="Search guests…" value="' + escapeHtml(filterText || "") + '" />';
+    wrap.appendChild(searchWrap);
+
+    var list = document.createElement("div");
+    var q = (filterText || "").toLowerCase();
+    var guests = state.guests.filter(function (g) { return g.label.toLowerCase().indexOf(q) !== -1; });
+    if (guests.length === 0) {
+      list.innerHTML = '<div class="empty-state">No guests match "' + escapeHtml(filterText) + '".</div>';
+    }
+    guests.forEach(function (g) {
+      var row = document.createElement("div");
+      row.className = "guest-row";
+      row.innerHTML =
+        '<div class="guest-thumb"><img src="' + g.qrDataUrl + '" alt="" /></div>' +
+        '<div class="guest-info">' +
+          '<div class="guest-label">' + escapeHtml(g.label) + '</div>' +
+          '<span class="chip ' + (g.status === "pending" ? "chip-pending" : "chip-shown") + '">' + (g.status === "pending" ? "Waiting" : "Shown") + '</span>' +
+          '<span class="chip chip-shown" style="margin-left:4px;">' + (g.photoCount || 0) + ' photos</span>' +
+        '</div>' +
+        '<button class="btn btn-ghost" style="min-height:auto;padding:8px 12px;" data-action="show" data-id="' + g.id + '">Show</button>' +
+        '<button class="icon-btn" data-action="remove" data-id="' + g.id + '" aria-label="Remove from this app\'s list">✕</button>';
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+
+    var resetRow = document.createElement("div");
+    resetRow.style.marginTop = "18px";
+    resetRow.style.textAlign = "center";
+    resetRow.innerHTML = '<button class="btn btn-danger-ghost" id="resetEventBtn" style="min-height:auto;">Start a new event…</button>';
+    wrap.appendChild(resetRow);
+
+    container.innerHTML = "";
+    container.appendChild(wrap);
+
+    document.getElementById("addGuestBtn").addEventListener("click", addGuest);
+    var searchEl = document.getElementById("guestSearch");
+    searchEl.addEventListener("input", function () { renderGuestsTab(container, searchEl.value); });
+    if (filterText) { searchEl.focus(); searchEl.setSelectionRange(filterText.length, filterText.length); }
+
+    list.querySelectorAll('[data-action="show"]').forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        state.currentGuestId = btn.getAttribute("data-id");
+        state.activeTab = "next";
+        saveState();
+        render();
+      });
+    });
+    list.querySelectorAll('[data-action="remove"]').forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.getAttribute("data-id");
+        var g = state.guests.find(function (x) { return x.id === id; });
+        var msg = g && g.photoCount > 0
+          ? 'Remove "' + g.label + '" from this app\'s list? Their Zenfolio gallery and ' + g.photoCount + ' uploaded photo(s) will NOT be deleted — do that in Zenfolio directly if you want it gone.'
+          : 'Remove "' + (g ? g.label : "this guest") + '" from this app\'s list? (Their empty Zenfolio gallery stays — delete it in Zenfolio directly if you want it gone.)';
+        if (!confirm(msg)) return;
+        state.guests = state.guests.filter(function (x) { return x.id !== id; });
+        if (state.currentGuestId === id) state.currentGuestId = null;
+        saveState();
+        render();
+      });
+    });
+    var resetBtn = document.getElementById("resetEventBtn");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        if (confirm("Start a new event? This clears the guest list here (their Zenfolio galleries are untouched) and lets you create a new event folder.")) {
+          var keptKeys = { appKey: state.appKey, userKey: state.userKey };
+          state = Object.assign(defaultState(), keptKeys);
+          saveState();
+          eventNameInput.value = state.eventName;
+          render();
+        }
+      });
+    }
+  }
+
+  // ---------- Next Up tab ----------
+  function nextPendingAfter(id) {
+    var order = state.guests;
+    var startIdx = order.findIndex(function (g) { return g.id === id; });
+    for (var i = startIdx + 1; i < order.length; i++) if (order[i].status === "pending") return order[i];
+    for (var j = 0; j <= startIdx; j++) if (order[j] && order[j].status === "pending") return order[j];
+    return null;
+  }
+
+  function renderNextTab(container) {
+    var wrap = document.createElement("div");
+    wrap.className = "spotlight-wrap";
+
+    if (state.guests.length === 0) {
+      wrap.innerHTML = '<div class="empty-state"><div class="big-emoji">🎫</div>Add a guest on the Guests tab to get started.</div>';
+      container.innerHTML = ""; container.appendChild(wrap); return;
+    }
+
+    var current = state.guests.find(function (g) { return g.id === state.currentGuestId; });
+    if (!current) {
+      current = state.guests.find(function (g) { return g.status === "pending"; }) || state.guests[0];
+      state.currentGuestId = current ? current.id : null;
+    }
+    if (!current) {
+      wrap.innerHTML = '<div class="empty-state"><div class="big-emoji">🎉</div>All guests have been shown their code.</div>';
+      container.innerHTML = ""; container.appendChild(wrap); return;
+    }
+
+    var idx = state.guests.findIndex(function (g) { return g.id === current.id; });
+    var pendingLeft = state.guests.filter(function (g) { return g.status === "pending"; }).length;
+
+    wrap.innerHTML =
+      '<div class="ticket">' +
+        '<div class="ticket-stub">' +
+          '<div class="ticket-eyebrow">Scan to view your photos</div>' +
+          '<div class="ticket-label">' + escapeHtml(current.label) + '</div>' +
+        '</div>' +
+        '<div class="ticket-perf"></div>' +
+        '<div class="ticket-qr"><img src="' + current.qrDataUrl + '" alt="QR code for ' + escapeHtml(current.label) + '" /></div>' +
+      '</div>' +
+      '<div class="progress-line">GUEST ' + (idx + 1) + ' OF ' + state.guests.length + ' · ' + pendingLeft + ' WAITING</div>' +
+      '<div class="spotlight-actions">' +
+        '<button class="btn btn-accent btn-block" id="markShownBtn">✓ Shown — Next Guest</button>' +
+        '<div class="btn-row">' +
+          '<button class="btn" id="prevGuestBtn" style="flex:1;">← Previous</button>' +
+          '<button class="btn" id="skipGuestBtn" style="flex:1;">Skip →</button>' +
+        '</div>' +
+      '</div>';
+
+    container.innerHTML = ""; container.appendChild(wrap);
+
+    document.getElementById("markShownBtn").addEventListener("click", function () {
+      current.status = "shown";
+      var next = nextPendingAfter(current.id);
+      state.currentGuestId = next ? next.id : null;
+      saveState(); render();
+    });
+    document.getElementById("skipGuestBtn").addEventListener("click", function () {
+      var next = nextPendingAfter(current.id) || state.guests[(idx + 1) % state.guests.length];
+      state.currentGuestId = next.id;
+      saveState(); render();
+    });
+    document.getElementById("prevGuestBtn").addEventListener("click", function () {
+      var prevIdx = (idx - 1 + state.guests.length) % state.guests.length;
+      state.currentGuestId = state.guests[prevIdx].id;
+      saveState(); render();
+    });
+  }
+
+  // ---------- Send Photos tab ----------
+  var photoFileInput = document.getElementById("photoFileInput");
+  photoFileInput.addEventListener("change", function (e) {
+    photoObjectUrls.forEach(function (u) { URL.revokeObjectURL(u); });
+    photoObjectUrls = [];
+    pendingPhotoFiles = Array.prototype.slice.call(e.target.files || []);
+    photoFileInput.value = "";
+    render();
+  });
+
+  function renderSendTab(container) {
+    var wrap = document.createElement("div");
+
+    if (state.guests.length === 0) {
+      wrap.innerHTML = '<div class="empty-state"><div class="big-emoji">📤</div>Add a guest first — photos upload straight into their gallery.</div>';
+      container.innerHTML = ""; container.appendChild(wrap); return;
+    }
+
+    var targetId = state.currentGuestId && state.guests.some(function (g) { return g.id === state.currentGuestId; })
+      ? state.currentGuestId : state.guests[0].id;
+
+    var guestOptions = state.guests.map(function (g) {
+      return '<option value="' + g.id + '"' + (g.id === targetId ? " selected" : "") + '>' + escapeHtml(g.label) + ' (' + (g.photoCount || 0) + ' uploaded)</option>';
+    }).join("");
+
+    wrap.innerHTML =
+      '<div class="hint" style="margin-bottom:14px;">Photos upload straight into the selected guest\'s Zenfolio gallery — no extra matching step.</div>' +
+      '<div class="field-label">Upload to</div>' +
+      '<select id="targetGuestSelect">' + guestOptions + '</select>' +
+      '<label class="btn btn-accent btn-block" for="photoFileInput" id="pickPhotosBtn" style="margin-top:14px;">📷 Select Photos</label>' +
+      '<div id="photoGridArea"></div>';
+
+    container.innerHTML = ""; container.appendChild(wrap);
+
+    var targetSelect = document.getElementById("targetGuestSelect");
+    targetSelect.addEventListener("change", function () {
+      state.currentGuestId = targetSelect.value;
+      saveState();
+    });
+
+    var gridArea = document.getElementById("photoGridArea");
+    if (pendingPhotoFiles.length === 0) return;
+
+    var grid = document.createElement("div");
+    grid.className = "photo-grid";
+    var cellsByIndex = [];
+
+    pendingPhotoFiles.forEach(function (file, i) {
+      var url = URL.createObjectURL(file);
+      photoObjectUrls.push(url);
+      var cell = document.createElement("div");
+      cell.className = "photo-cell";
+      cell.innerHTML = '<img src="' + url + '" alt="' + escapeHtml(file.name) + '" /><span class="badge badge-new">New</span>';
+      grid.appendChild(cell);
+      cellsByIndex.push(cell);
+    });
+
+    gridArea.innerHTML = "";
+    gridArea.appendChild(grid);
+
+    var summary = document.createElement("div");
+    summary.className = "send-summary";
+    summary.textContent = pendingPhotoFiles.length + " photo(s) ready";
+    gridArea.appendChild(summary);
+
+    var uploadBtn = document.createElement("button");
+    uploadBtn.className = "btn btn-accent btn-block";
+    uploadBtn.style.marginTop = "12px";
+    uploadBtn.textContent = "⬆ Upload to " + (state.guests.find(function (g) { return g.id === targetSelect.value; }) || {}).label;
+    gridArea.appendChild(uploadBtn);
+
+    var msgArea = document.createElement("div");
+    gridArea.appendChild(msgArea);
+
+    uploadBtn.addEventListener("click", async function () {
+      var guest = state.guests.find(function (g) { return g.id === targetSelect.value; });
+      if (!guest) return;
+      uploadBtn.disabled = true;
+      targetSelect.disabled = true;
+      var batchTimestamp = Date.now();
+      var successCount = 0, errorCount = 0, lastError = "";
+
+      for (var i = 0; i < pendingPhotoFiles.length; i++) {
+        var file = pendingPhotoFiles[i];
+        var cell = cellsByIndex[i];
+        cell.innerHTML += '<span class="spin">Uploading…</span>';
+        try {
+          var fd = new FormData();
+          fd.append("galleryId", guest.galleryId);
+          fd.append("batchTimestamp", String(batchTimestamp));
+          fd.append("defaultCover", (guest.photoCount === 0 && i === 0) ? "true" : "false");
+          fd.append("photo", file, file.name); // must be last field
+          var res;
+          try {
+            res = await fetch(API_BASE + "/photo", {
+              method: "POST",
+              headers: apiHeaders(),
+              body: fd
+            });
+          } catch (netErr) {
+            throw new Error(NETWORK_ERROR);
+          }
+          if (!res.ok) {
+            var errText = await res.text();
+            throw new Error("HTTP " + res.status + (errText ? (" — " + errText.slice(0, 120)) : ""));
+          }
+          guest.photoCount = (guest.photoCount || 0) + 1;
+          successCount++;
+          cell.innerHTML = '<img src="' + cell.querySelector("img").src + '" alt="" /><span class="badge badge-sent">Sent</span>';
+        } catch (err) {
+          errorCount++;
+          lastError = err.message;
+          cell.innerHTML = '<img src="' + cell.querySelector("img").src + '" alt="" /><span class="badge badge-err">Failed</span>';
+        }
+      }
+
+      state.lastSyncAt = Date.now();
+      saveState();
+
+      if (errorCount === 0) {
+        msgArea.innerHTML = '<div class="send-msg ok">Uploaded ' + successCount + ' photo(s) to ' + escapeHtml(guest.label) + '\'s gallery.</div>';
+      } else {
+        msgArea.innerHTML = '<div class="send-msg err">' + successCount + ' uploaded, ' + errorCount + ' failed. Last error: ' + escapeHtml(lastError) + '</div>';
+      }
+      renderStatusRow();
+      uploadBtn.disabled = false;
+      targetSelect.disabled = false;
+      uploadBtn.textContent = "⬆ Upload to " + guest.label;
+    });
+  }
+
+  // ---------- Render ----------
+  function render() {
+    updateTabHighlight();
+    renderStatusRow();
+    var main = document.getElementById("main");
+    if (state.activeTab === "settings") { renderSettingsTab(main); return; }
+    if (state.activeTab === "guests") renderGuestsTab(main, "");
+    else if (state.activeTab === "next") renderNextTab(main);
+    else renderSendTab(main);
+  }
+
+  // Regenerate QR data URLs on load for any guest missing one (e.g. state restored without it)
+  state.guests.forEach(function (g) {
+    if (!g.qrDataUrl && g.url) g.qrDataUrl = generateQrDataUrl(g.url, 240);
+  });
+
+  if (!state.appKey || !state.userKey) state.activeTab = "settings";
+  render();
+  setInterval(renderStatusRow, 30000);
+})();
+</script>
+</body>
+</html>
