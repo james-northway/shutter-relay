@@ -270,7 +270,7 @@
     font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
     text-transform: uppercase; color: var(--text-dim);
   }
-  .ticket-label { font-size: 34px; font-weight: 800; line-height: 1.05; margin-top: 2px; }
+  .ticket-label { font-size: 30px; font-weight: 800; line-height: 1.05; margin-top: 2px; overflow-wrap: anywhere; }
   .ticket-perf { height: 0; border-top: 2px dashed var(--border); position: relative; }
   .ticket-perf::before, .ticket-perf::after {
     content: ""; position: absolute; top: -9px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg);
@@ -379,6 +379,8 @@
       shootTypeId: 44,
       activeTab: "guests",
       guests: [],          // {id, galleryId, alias, url, label, status:'pending'|'shown', photoCount, qrDataUrl}
+      guestPrefix: "",     // e.g. "test_folder" -> galleries test_folder_0001, _0002, ...
+      guestCounter: 0,
       currentGuestId: null,
       lastSyncAt: null
     };
@@ -558,6 +560,8 @@
       try {
         var resp = await apiRequestJson("POST", "/folder", { parentId: ROOT_FOLDER_ID, name: state.eventName });
         state.eventFolderId = resp.id;
+        state.guestPrefix = namePrefix(state.eventName);
+        state.guestCounter = 0;
         saveState();
         render();
       } catch (err) {
@@ -568,11 +572,38 @@
   }
 
   // ---------- Guests tab ----------
+  // "Test Folder" / "Test_folder" -> "test_folder". Zenfolio rejects % $ # @ ` ! ~ / \ in names.
+  function namePrefix(eventName) {
+    var p = String(eventName || "").trim().toLowerCase()
+      .replace(/[%$#@`!~\/\\]/g, "")
+      .replace(/\s+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "");
+    return p || "event";
+  }
+
+  // Random suffix so one guest's link can't be guessed from another's.
+  // 6 characters from 31 look-alike-free symbols is about 887 million combinations per guest.
+  function randomCode(len) {
+    var alphabet = "abcdefghjkmnpqrstuvwxyz23456789";
+    var bytes = new Uint8Array(len);
+    crypto.getRandomValues(bytes);
+    var out = "";
+    for (var i = 0; i < len; i++) out += alphabet[bytes[i] % alphabet.length];
+    return out;
+  }
+
+  var addingGuest = false;
+
   async function addGuest() {
-    var label = window.prompt("Guest or table name (used for the gallery and the label on their QR ticket):");
-    if (!label) return;
-    label = label.trim();
-    if (!label) return;
+    if (addingGuest) return;   // ignore double-taps so we never create two galleries
+    addingGuest = true;
+    var addBtns = document.querySelectorAll("#addGuestBtn, #nextAddGuestBtn, #sendAddGuestBtn, #afterUploadAddBtn");
+    addBtns.forEach(function (b) { b.disabled = true; b.textContent = "Creating gallery…"; });
+
+    if (!state.guestPrefix) state.guestPrefix = namePrefix(state.eventName);
+    var nextNum = (state.guestCounter || 0) + 1;
+    var label = state.guestPrefix + "_" + ("0000" + nextNum).slice(-4) + "_" + randomCode(6);
     try {
       var created = await apiRequestJson("POST", "/gallery", {
         parentId: state.eventFolderId,
@@ -582,7 +613,7 @@
       });
       var details = await apiRequestJson("GET", "/gallery/" + created.id, undefined);
       var url = GALLERY_URL_BASE + details.alias;
-      state.guests.push({
+      var newGuest = {
         id: uid(),
         galleryId: created.id,
         alias: details.alias,
@@ -591,11 +622,19 @@
         status: "pending",
         photoCount: 0,
         qrDataUrl: generateQrDataUrl(url, 240)
-      });
+      };
+      state.guests.push(newGuest);
+      state.guestCounter = nextNum;
+      // Jump straight to the new guest's QR so it's ready to scan
+      state.currentGuestId = newGuest.id;
+      state.activeTab = "next";
       saveState();
+      addingGuest = false;
       render();
     } catch (err) {
-      alert("Couldn't create this guest's gallery: " + err.message);
+      addingGuest = false;
+      render();
+      alert("Couldn't create " + label + ": " + err.message);
     }
   }
 
@@ -623,7 +662,7 @@
     if (state.guests.length === 0) {
       var empty = document.createElement("div");
       empty.className = "hint";
-      empty.innerHTML = 'Add your first guest — this creates their private gallery on Zenfolio automatically and generates their QR code, no import needed.';
+      empty.innerHTML = 'Tap Add Guest to create the first guest gallery. Galleries are named from your event name, e.g. <strong>' + escapeHtml((state.guestPrefix || namePrefix(state.eventName)) + '_0001_k7q2xz') + '</strong> (the random end keeps guests from guessing each other\'s links), and each one gets its own QR code automatically.';
       wrap.appendChild(empty);
       container.innerHTML = "";
       container.appendChild(wrap);
@@ -728,12 +767,23 @@
 
     var current = state.guests.find(function (g) { return g.id === state.currentGuestId; });
     if (!current) {
-      current = state.guests.find(function (g) { return g.status === "pending"; }) || state.guests[0];
+      current = state.guests.find(function (g) { return g.status === "pending"; });
       state.currentGuestId = current ? current.id : null;
     }
     if (!current) {
-      wrap.innerHTML = '<div class="empty-state"><div class="big-emoji">🎉</div>All guests have been shown their code.</div>';
-      container.innerHTML = ""; container.appendChild(wrap); return;
+      wrap.innerHTML =
+        '<div class="empty-state"><div class="big-emoji">🎉</div>Everyone so far has been shown their code.</div>' +
+        '<div class="spotlight-actions">' +
+          '<button class="btn btn-accent btn-block" id="nextAddGuestBtn">＋ Add Next Guest</button>' +
+          '<button class="btn btn-block" id="reviewLastBtn">← Show the last guest again</button>' +
+        '</div>';
+      container.innerHTML = ""; container.appendChild(wrap);
+      document.getElementById("nextAddGuestBtn").addEventListener("click", addGuest);
+      document.getElementById("reviewLastBtn").addEventListener("click", function () {
+        state.currentGuestId = state.guests[state.guests.length - 1].id;
+        saveState(); render();
+      });
+      return;
     }
 
     var idx = state.guests.findIndex(function (g) { return g.id === current.id; });
@@ -755,18 +805,25 @@
           '<button class="btn" id="prevGuestBtn" style="flex:1;">← Previous</button>' +
           '<button class="btn" id="skipGuestBtn" style="flex:1;">Skip →</button>' +
         '</div>' +
+        '<button class="btn btn-block" id="nextAddGuestBtn">＋ Add Guest</button>' +
+        '<div id="nextMsg"></div>' +
       '</div>';
 
     container.innerHTML = ""; container.appendChild(wrap);
 
+    document.getElementById("nextAddGuestBtn").addEventListener("click", addGuest);
     document.getElementById("markShownBtn").addEventListener("click", function () {
       current.status = "shown";
       var next = nextPendingAfter(current.id);
-      state.currentGuestId = next ? next.id : null;
+      state.currentGuestId = (next && next.id !== current.id) ? next.id : null;
       saveState(); render();
     });
     document.getElementById("skipGuestBtn").addEventListener("click", function () {
-      var next = nextPendingAfter(current.id) || state.guests[(idx + 1) % state.guests.length];
+      var next = nextPendingAfter(current.id);
+      if (!next || next.id === current.id) {
+        document.getElementById("nextMsg").innerHTML = '<div class="send-msg err">No one else is waiting. Tap ＋ Add Guest to add the next person.</div>';
+        return;
+      }
       state.currentGuestId = next.id;
       saveState(); render();
     });
@@ -807,9 +864,11 @@
       '<div class="field-label">Upload to</div>' +
       '<select id="targetGuestSelect">' + guestOptions + '</select>' +
       '<label class="btn btn-accent btn-block" for="photoFileInput" id="pickPhotosBtn" style="margin-top:14px;">📷 Select Photos</label>' +
+      '<button class="btn btn-block" id="sendAddGuestBtn" style="margin-top:10px;">＋ Add Next Guest</button>' +
       '<div id="photoGridArea"></div>';
 
     container.innerHTML = ""; container.appendChild(wrap);
+    document.getElementById("sendAddGuestBtn").addEventListener("click", addGuest);
 
     var targetSelect = document.getElementById("targetGuestSelect");
     targetSelect.addEventListener("change", function () {
@@ -820,36 +879,62 @@
     var gridArea = document.getElementById("photoGridArea");
     if (pendingPhotoFiles.length === 0) return;
 
-    var grid = document.createElement("div");
-    grid.className = "photo-grid";
-    var cellsByIndex = [];
-
-    pendingPhotoFiles.forEach(function (file, i) {
-      var url = URL.createObjectURL(file);
-      photoObjectUrls.push(url);
-      var cell = document.createElement("div");
-      cell.className = "photo-cell";
-      cell.innerHTML = '<img src="' + url + '" alt="' + escapeHtml(file.name) + '" /><span class="badge badge-new">New</span>';
-      grid.appendChild(cell);
-      cellsByIndex.push(cell);
-    });
-
-    gridArea.innerHTML = "";
-    gridArea.appendChild(grid);
-
+    // Upload button + status go ABOVE the thumbnails so they're never buried under a long burst
     var summary = document.createElement("div");
     summary.className = "send-summary";
     summary.textContent = pendingPhotoFiles.length + " photo(s) ready";
-    gridArea.appendChild(summary);
 
     var uploadBtn = document.createElement("button");
     uploadBtn.className = "btn btn-accent btn-block";
     uploadBtn.style.marginTop = "12px";
-    uploadBtn.textContent = "⬆ Upload to " + (state.guests.find(function (g) { return g.id === targetSelect.value; }) || {}).label;
-    gridArea.appendChild(uploadBtn);
+    uploadBtn.textContent = "⬆ Upload " + pendingPhotoFiles.length + " to " + (state.guests.find(function (g) { return g.id === targetSelect.value; }) || {}).label;
 
     var msgArea = document.createElement("div");
+
+    var grid = document.createElement("div");
+    grid.className = "photo-grid";
+    var cellsByIndex = [];
+    var sentFlags = []; // which photos already uploaded, so a retry never duplicates them
+
+    function setCellBadge(cell, cls, text) {
+      var old = cell.querySelectorAll(".badge, .spin");
+      for (var k = 0; k < old.length; k++) old[k].remove();
+      var b = document.createElement("span");
+      b.className = cls;
+      b.textContent = text;
+      cell.appendChild(b);
+    }
+
+    // Draw small thumbnails instead of decoding full-size camera files (keeps the phone fast)
+    function makeThumb(file, img) {
+      if (!window.createImageBitmap) return;
+      createImageBitmap(file, { resizeWidth: 180, resizeQuality: "low" }).then(function (bmp) {
+        var c = document.createElement("canvas");
+        c.width = bmp.width; c.height = bmp.height;
+        c.getContext("2d").drawImage(bmp, 0, 0);
+        img.src = c.toDataURL("image/jpeg", 0.6);
+        if (bmp.close) bmp.close();
+      }).catch(function () { /* leave placeholder */ });
+    }
+
+    pendingPhotoFiles.forEach(function (file) {
+      var cell = document.createElement("div");
+      cell.className = "photo-cell";
+      cell.style.background = "var(--surface-2)";
+      var img = document.createElement("img");
+      img.alt = file.name;
+      cell.appendChild(img);
+      setCellBadge(cell, "badge badge-new", "New");
+      grid.appendChild(cell);
+      cellsByIndex.push(cell);
+      makeThumb(file, img);
+    });
+
+    gridArea.innerHTML = "";
+    gridArea.appendChild(summary);
+    gridArea.appendChild(uploadBtn);
     gridArea.appendChild(msgArea);
+    gridArea.appendChild(grid);
 
     uploadBtn.addEventListener("click", async function () {
       var guest = state.guests.find(function (g) { return g.id === targetSelect.value; });
@@ -860,9 +945,11 @@
       var successCount = 0, errorCount = 0, lastError = "";
 
       for (var i = 0; i < pendingPhotoFiles.length; i++) {
+        if (sentFlags[i]) continue;
         var file = pendingPhotoFiles[i];
         var cell = cellsByIndex[i];
-        cell.innerHTML += '<span class="spin">Uploading…</span>';
+        setCellBadge(cell, "spin", "Uploading…");
+        uploadBtn.textContent = "Uploading " + (i + 1) + " of " + pendingPhotoFiles.length + "…";
         try {
           var fd = new FormData();
           fd.append("galleryId", guest.galleryId);
@@ -884,12 +971,13 @@
             throw new Error("HTTP " + res.status + (errText ? (" — " + errText.slice(0, 120)) : ""));
           }
           guest.photoCount = (guest.photoCount || 0) + 1;
+          sentFlags[i] = true;
           successCount++;
-          cell.innerHTML = '<img src="' + cell.querySelector("img").src + '" alt="" /><span class="badge badge-sent">Sent</span>';
+          setCellBadge(cell, "badge badge-sent", "Sent");
         } catch (err) {
           errorCount++;
           lastError = err.message;
-          cell.innerHTML = '<img src="' + cell.querySelector("img").src + '" alt="" /><span class="badge badge-err">Failed</span>';
+          setCellBadge(cell, "badge badge-err", "Failed");
         }
       }
 
@@ -897,14 +985,25 @@
       saveState();
 
       if (errorCount === 0) {
-        msgArea.innerHTML = '<div class="send-msg ok">Uploaded ' + successCount + ' photo(s) to ' + escapeHtml(guest.label) + '\'s gallery.</div>';
+        guest.status = "shown";   // they've been photographed and uploaded, so they're done
+        saveState();
+        msgArea.innerHTML =
+          '<div class="send-msg ok">Uploaded ' + successCount + ' photo(s) to ' + escapeHtml(guest.label) + '\'s gallery.</div>' +
+          '<div class="btn-row" style="margin-top:10px;">' +
+            '<button class="btn btn-accent" id="afterUploadAddBtn" style="flex:1;">＋ Add Next Guest</button>' +
+            '<button class="btn" id="afterUploadNextBtn" style="flex:1;">Back to Next Up</button>' +
+          '</div>';
+        document.getElementById("afterUploadAddBtn").addEventListener("click", addGuest);
+        document.getElementById("afterUploadNextBtn").addEventListener("click", function () {
+          state.activeTab = "next"; saveState(); render();
+        });
       } else {
         msgArea.innerHTML = '<div class="send-msg err">' + successCount + ' uploaded, ' + errorCount + ' failed. Last error: ' + escapeHtml(lastError) + '</div>';
       }
       renderStatusRow();
       uploadBtn.disabled = false;
       targetSelect.disabled = false;
-      uploadBtn.textContent = "⬆ Upload to " + guest.label;
+      uploadBtn.textContent = errorCount === 0 ? "✓ Done — upload more?" : "⬆ Retry upload to " + guest.label;
     });
   }
 
