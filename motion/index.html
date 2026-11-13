@@ -1,4 +1,4 @@
-<title>Strong Brief</title>
+<title>Motion</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
 <style id="app-style">
@@ -111,7 +111,7 @@ details.how p{margin:6px 0 0;font-size:.84rem;color:var(--ink-2)}
 .hint.up{background:var(--mark);color:var(--mark-ink)}
 .hint .num{white-space:nowrap}
 .sets{display:flex;flex-direction:column;gap:7px;margin-top:12px}
-.srow{display:grid;grid-template-columns:22px minmax(0,1fr) minmax(0,1fr) 44px;gap:8px;align-items:center}
+.srow{display:grid;grid-template-columns:22px minmax(0,1fr) 44px;gap:8px;align-items:center}
 .srow .n{font-family:var(--f-mono);font-size:.74rem;color:var(--muted);text-align:center}
 .fld{position:relative}
 .fld label{position:absolute;top:-7px;left:9px;font-size:.6rem;letter-spacing:.04em;color:var(--muted);background:var(--surface);padding:0 4px;text-transform:uppercase}
@@ -250,79 +250,105 @@ textarea.bk{width:100%;min-height:90px;border:1px solid var(--border);background
 @media (prefers-reduced-motion:no-preference){.chk,.card,.btn{transition:background-color .15s,border-color .15s,opacity .15s}}
 </style>
 <div id="root"></div>
-<script id="app-data" type="application/json">{"meta":{"savedAt":null,"v":1},"settings":{"name":"","startDate":"2026-11-16","kcal":1450,"protein":115,"goalWeight":122,"goalWaist":null,"swaps":{}},"logs":{},"body":{"2026-11-13":{"w":128}},"meals":{}}</script>
+<script id="app-data" type="application/json">{"meta":{"savedAt":null,"v":1},"settings":{"name":"","startDate":"2026-11-16","kcal":1400,"protein":110,"goalWeight":122,"goalWaist":null,"swaps":{}},"logs":{},"body":{"2026-11-13":{"w":128}},"meals":{}}</script>
 <script id="app-js">
 (function(){
 "use strict";
 
 /* ================= data: exercise library ================= */
 var EX = {
-  bb_row:{n:"Barbell Bent-Over Row",m:"back",k:"compound",u:"reps",inc:5,start:45,rest:90,
-    cue:"Hinge at the hips until your torso is about 45°, soft knees, flat back. Pull the bar to your belly button and squeeze your shoulder blades together. Lower with control.",alts:["db_row","chest_row"]},
-  db_row:{n:"Single-Arm DB Row (per side)",m:"back",k:"accessory",u:"reps",inc:5,start:20,rest:60,
-    cue:"One hand and knee on the bench, back flat. Drive your elbow toward your hip, pause at the top, lower slowly. Do all reps on one side, then switch.",alts:["chest_row","bb_row"]},
-  inv_row:{n:"Rack Inverted Row",m:"back",k:"accessory",u:"reps",inc:0,start:0,bw:true,rest:60,
-    cue:"Set a barbell in the rack at hip height. Hang underneath with straight arms, body rigid like a plank. Pull your chest to the bar. Lower the bar a notch to make it harder; bend your knees to make it easier.",alts:["chest_row","db_row"]},
-  chest_row:{n:"Chest-Supported DB Row",m:"back",k:"accessory",u:"reps",inc:5,start:15,rest:60,
-    cue:"Lie face down on a bench set to about 30°. Let the dumbbells hang, then row them up to your ribs, squeezing your upper back. No swinging.",alts:["db_row","inv_row"]},
-  db_pullover:{n:"DB Pullover",m:"back",k:"accessory",u:"reps",inc:5,start:15,rest:60,
-    cue:"Lie across or along the bench holding one dumbbell over your chest with both hands. Lower it behind your head with slightly bent elbows until you feel a lat stretch, then pull it back over.",alts:["db_row","inv_row"]},
-  rdf:{n:"Bent-Over Rear-Delt Fly",m:"back",k:"accessory",u:"reps",inc:2,start:8,rest:45,
-    cue:"Hinge forward with light dumbbells hanging. Lead with your elbows and open your arms out wide like wings. Keep the weight light and the squeeze strong.",alts:["ytw"]},
-  ytw:{n:"Prone Y-T-W Raise",m:"back",k:"accessory",u:"reps",inc:2,start:3,rest:45,
-    cue:"Lie face down on an incline bench. Raise your arms into a Y, then a T, then a W. That's one rep. Bodyweight or 2–5 lb dumbbells. Great for posture.",alts:["rdf"]},
-  pullneg:{n:"Pull-Up Negatives",m:"back",k:"accessory",u:"reps",inc:0,start:0,bw:true,rest:75,rr:[3,5],
-    cue:"Step up on a box so your chin is over the rack's pull-up bar. Lower yourself as slowly as you can (aim for 3–5 seconds). Step back up and repeat. This is how you earn your first pull-up.",alts:["inv_row","chest_row"]},
-  dl:{n:"Barbell Deadlift",m:"back",k:"compound",u:"reps",inc:5,start:65,rest:90,
-    cue:"Bar over mid-foot. Hinge down, grip just outside your legs, chest up, back flat. Push the floor away and stand tall, keeping the bar close. Lower by pushing your hips back.",alts:["db_rdl"]},
-  squat:{n:"Barbell Back Squat",m:"legs",k:"compound",u:"reps",inc:5,start:45,rest:90,
-    cue:"Bar on your upper back, feet shoulder-width. Brace your core, sit down and back until thighs are about parallel, then drive up. Set the rack safety bars just below your bottom position.",alts:["goblet"]},
-  goblet:{n:"Goblet Squat",m:"legs",k:"accessory",u:"reps",inc:5,start:25,rest:60,
-    cue:"Hold one dumbbell at your chest, elbows down. Squat between your knees, chest tall, then stand.",alts:["squat","rev_lunge"]},
-  db_rdl:{n:"DB Romanian Deadlift",m:"legs",k:"accessory",u:"reps",inc:5,start:20,rest:60,
-    cue:"Dumbbells in front of your thighs. Push your hips back with soft knees, sliding the weights down your legs until you feel your hamstrings stretch. Squeeze your glutes to stand. Weight is per dumbbell.",alts:["dl"]},
-  hip_thrust:{n:"Barbell Hip Thrust",m:"legs",k:"accessory",u:"reps",inc:10,start:65,rest:60,
-    cue:"Upper back on the bench, padded bar across your hips. Drive through your heels to lift your hips until your body is flat, pause and squeeze, lower slowly. Use a dumbbell on your hips if you prefer.",alts:["db_rdl"]},
-  rev_lunge:{n:"DB Reverse Lunge (per leg)",m:"legs",k:"accessory",u:"reps",inc:5,start:12,rest:60,
-    cue:"Dumbbell in each hand. Step one foot back and lower until both knees are about 90°. Push through the front heel to return. Weight is per dumbbell.",alts:["stepup","goblet"]},
-  stepup:{n:"DB Step-Up (per leg)",m:"legs",k:"accessory",u:"reps",inc:5,start:10,rest:60,
-    cue:"Step onto a sturdy bench or box with your whole foot. Drive through that heel to stand tall, then step down slowly. Weight is per dumbbell.",alts:["rev_lunge"]},
-  db_ohp:{n:"Seated DB Shoulder Press",m:"push",k:"accessory",u:"reps",inc:5,start:12,rest:60,
-    cue:"Sit tall against an upright bench. Press the dumbbells overhead without arching your back, lower to ear height.",alts:["pushup"]},
-  db_bench:{n:"DB Bench Press",m:"push",k:"accessory",u:"reps",inc:5,start:20,rest:60,
-    cue:"Lie on the bench, feet planted, shoulder blades pinched. Lower the dumbbells to chest level, press up. Weight is per dumbbell.",alts:["pushup"]},
-  pushup:{n:"Push-Up",m:"push",k:"accessory",u:"reps",inc:0,start:0,bw:true,rest:60,
-    cue:"Hands under shoulders, body in one straight line. Lower your chest to the floor and push back up. Too hard? Put your hands on the barbell set in the rack (incline push-up).",alts:["db_bench"]},
-  deadbug:{n:"Dead Bug (per side)",m:"core",k:"core",u:"reps",inc:0,start:0,bw:true,rest:30,tgt:8,step:2,
-    cue:"Lie on your back, arms up, knees bent over hips. Press your lower back into the floor. Slowly extend the opposite arm and leg, return, switch. This trains the deep core that flattens your waist.",alts:["plank"]},
-  plank:{n:"Plank",m:"core",k:"core",u:"sec",inc:0,start:0,bw:true,rest:30,tgt:30,step:10,
-    cue:"Forearms down, body straight from head to heels. Squeeze your glutes and pull your belly button toward your spine. Breathe.",alts:["deadbug"]},
-  sideplank:{n:"Side Plank (per side)",m:"core",k:"core",u:"sec",inc:0,start:0,bw:true,rest:30,tgt:20,step:10,
-    cue:"On one forearm, feet stacked, hips lifted so your body is straight. Drop to your knees if needed.",alts:["plank"]},
-  suitcase:{n:"Suitcase Carry (per side)",m:"core",k:"core",u:"sec",inc:5,start:25,rest:30,tgt:30,step:10,
-    cue:"Hold one heavy dumbbell at your side and walk tall without leaning. Your obliques work hard to keep you straight. Switch hands.",alts:["farmer"]},
-  farmer:{n:"Farmer Carry",m:"core",k:"core",u:"sec",inc:5,start:20,rest:45,tgt:40,step:10,
-    cue:"A heavy dumbbell in each hand, shoulders back and down, walk with short quick steps. Builds grip, traps and upper back. Weight is per dumbbell.",alts:["suitcase"]}
+  door_row:{n:"Doorframe Row (per side)",m:"back",k:"main",u:"reps",rr:[8,10],rest:45,
+    cue:"Stand facing an open doorway. Grip the edge of the frame with one hand at chest height, feet close to the wall. Lean back until your arm is straight, then pull your chest to your hand, squeezing your shoulder blade back. Lower slowly.",
+    easier:"Stand more upright, feet farther from the frame.",harder:"Walk your feet closer to the frame so you lean back further, and pause 2 seconds at the top.",alts:["towel_row","table_row"]},
+  towel_row:{n:"Towel Isometric Row",m:"back",k:"main",u:"sec",tgt:20,step:5,rest:30,
+    cue:"Sit on the floor with legs straight, loop a bath towel around your feet and hold both ends. Pull hard as if rowing, squeezing your shoulder blades together, while your feet resist. Hold and breathe.",
+    easier:"Pull at about 70% effort.",harder:"Full effort, and add 5 seconds.",alts:["door_row"]},
+  table_row:{n:"Table Inverted Row",m:"back",k:"main",u:"reps",rr:[6,8],rest:45,
+    cue:"Only under a very sturdy table. Lie underneath, grip the edge, body straight from heels to head. Pull your chest to the edge, lower slowly.",
+    easier:"Bend your knees with feet flat.",harder:"Straight legs and a 2-second pause at the top.",alts:["door_row"]},
+  towel_pd:{n:"Towel Lat Pulldown",m:"back",k:"acc",u:"reps",rr:[10,12],rest:30,
+    cue:"Hold a towel overhead with hands wide, pulled taut. Pull your elbows down to your ribs while pulling outward on the towel as hard as you can, so your lats and mid-back work. Squeeze 2 seconds, reach back up.",
+    easier:"Seated, with less pulling tension.",harder:"Lie face down and do it with your chest lifted off the floor.",alts:["swimmer"]},
+  snow:{n:"Reverse Snow Angel",m:"back",k:"acc",u:"reps",rr:[8,10],rest:30,
+    cue:"Lie face down, forehead on a folded towel, arms by your sides, palms down. Lift your arms slightly and sweep them in a wide arc overhead, then back. Keep them off the floor the whole time.",
+    easier:"Smaller arcs; rest your arms between reps.",harder:"Lift your chest slightly too, and move slower.",alts:["ytw","swimmer"]},
+  ytw:{n:"Prone Y-T-W Raise",m:"back",k:"acc",u:"reps",rr:[6,8],rest:30,
+    cue:"Lie face down. Lift your arms into a Y overhead, then out to a T, then pull your elbows down into a W, squeezing your shoulder blades each time. That's one rep. Thumbs point up.",
+    easier:"Do only the T and W.",harder:"Hold each letter for 2 seconds.",alts:["snow"]},
+  superman:{n:"Superman Hold",m:"back",k:"acc",u:"sec",tgt:20,step:5,rest:30,
+    cue:"Lie face down, arms overhead. Lift your arms, chest and legs a few inches off the floor and hold. Look at the floor to keep your neck long.",
+    easier:"Lift only your arms and chest.",harder:"Add small flutter kicks while holding.",alts:["swimmer","birddog"]},
+  swimmer:{n:"Prone Swimmers",m:"back",k:"acc",u:"reps",rr:[10,12],rest:30,
+    cue:"Lie face down, arms overhead and slightly lifted. Sweep your arms around to your lower back like a breaststroke, then back overhead, never touching the floor.",
+    easier:"Rest your hands overhead between reps.",harder:"Lift your legs at the same time.",alts:["snow","superman"]},
+  good_morning:{n:"Bodyweight Good Morning",m:"back",k:"acc",u:"reps",rr:[12,15],rest:30,
+    cue:"Stand with hands behind your head, soft knees. Push your hips back and tip forward with a flat back until you feel your hamstrings, then squeeze your glutes to stand. Strengthens the lower back safely.",
+    easier:"Smaller range, hands on hips.",harder:"3-second lowering, or one leg at a time.",alts:["bridge"]},
+  birddog:{n:"Bird Dog (per side)",m:"core",k:"core",u:"reps",tgt:8,step:2,rest:30,
+    cue:"On hands and knees, back flat. Reach one arm forward and the opposite leg back until both are level with your body. Pause 2 seconds, return without rocking, switch.",
+    easier:"Move only the leg.",harder:"Hover your knees an inch off the floor.",alts:["deadbug"]},
+  squat:{n:"Bodyweight Squat",m:"legs",k:"main",u:"reps",rr:[12,15],rest:45,
+    cue:"Feet shoulder-width, arms out front. Sit your hips back and down until your thighs are about parallel, chest tall, then stand. Take 3 seconds on the way down.",
+    easier:"Squat to a chair and stand back up.",harder:"Pause 3 seconds at the bottom.",alts:["split","wallsit"]},
+  split:{n:"Split Squat (per leg)",m:"legs",k:"main",u:"reps",rr:[8,10],rest:45,
+    cue:"Stand in a long stride. Lower straight down until your back knee nearly touches the floor, front shin vertical. Push through the front heel to rise. Hold a wall for balance if needed.",
+    easier:"Shorter range, hand on a wall.",harder:"Rear foot up on a stair or sofa edge.",alts:["rev_lunge","squat"]},
+  rev_lunge:{n:"Reverse Lunge (per leg)",m:"legs",k:"acc",u:"reps",rr:[8,10],rest:45,
+    cue:"Step one foot back and lower until both knees are about 90°. Push through the front heel to return. Easier on the knees than forward lunges.",
+    easier:"Hold a wall or chair back.",harder:"Pause 2 seconds at the bottom.",alts:["split","stepup"]},
+  bridge:{n:"Glute Bridge",m:"legs",k:"acc",u:"reps",rr:[12,15],rest:30,
+    cue:"Lie on your back, knees bent, feet flat. Press through your heels to lift your hips until your body is straight from knees to shoulders. Squeeze 2 seconds, lower slowly.",
+    easier:"Smaller range.",harder:"Switch to single-leg bridges.",alts:["sl_bridge"]},
+  sl_bridge:{n:"Single-Leg Glute Bridge (per side)",m:"legs",k:"acc",u:"reps",rr:[8,10],rest:30,
+    cue:"Like a glute bridge but with one foot lifted. Keep your hips level as you rise.",
+    easier:"Go back to two-leg bridges.",harder:"Shoulders on the sofa edge for more range.",alts:["bridge"]},
+  stepup:{n:"Stair Step-Up (per leg)",m:"legs",k:"acc",u:"reps",rr:[10,12],rest:30,
+    cue:"Use the bottom stair and hold the rail. Step up with your whole foot, drive through that heel to stand tall, step down slowly.",
+    easier:"Push off lightly with the back foot.",harder:"Use the second stair.",alts:["rev_lunge"]},
+  wallsit:{n:"Wall Sit",m:"legs",k:"core",u:"sec",tgt:30,step:10,rest:30,
+    cue:"Back flat against a wall, slide down until your knees are near 90°. Hold and breathe steadily.",
+    easier:"Sit higher.",harder:"Sit lower, or lift one heel.",alts:["squat"]},
+  incline_pu:{n:"Incline Push-Up",m:"push",k:"acc",u:"reps",rr:[8,10],rest:30,
+    cue:"Hands on a kitchen counter or sturdy table edge, body in a straight line. Lower your chest to the edge and push away. The lower the surface, the harder it gets.",
+    easier:"Use a wall.",harder:"Use a lower surface like a sofa seat or a stair.",alts:["pushup"]},
+  pushup:{n:"Push-Up",m:"push",k:"acc",u:"reps",rr:[5,8],rest:45,
+    cue:"Hands under shoulders, body straight. Lower your chest toward the floor and push up. Knees down is fine.",
+    easier:"Knees down, or incline push-ups.",harder:"3-second lowering on every rep.",alts:["incline_pu"]},
+  deadbug:{n:"Dead Bug (per side)",m:"core",k:"core",u:"reps",tgt:8,step:2,rest:30,
+    cue:"Lie on your back, arms up, knees bent over hips. Press your lower back into the floor. Slowly extend the opposite arm and leg, return, switch. Trains the deep core that flattens the waist.",
+    easier:"Move only the legs.",harder:"Slower, with straighter legs.",alts:["birddog"]},
+  plank:{n:"Plank",m:"core",k:"core",u:"sec",tgt:25,step:10,rest:30,
+    cue:"Forearms down, body straight from head to heels. Squeeze your glutes and pull your belly button toward your spine. Breathe.",
+    easier:"Knees down.",harder:"Lift one foot for half the time, then the other.",alts:["bear"]},
+  sideplank:{n:"Side Plank (per side)",m:"core",k:"core",u:"sec",tgt:20,step:10,rest:30,
+    cue:"On one forearm, hips lifted so your body is straight. Works the obliques at the sides of the waist.",
+    easier:"Bottom knee down.",harder:"Lift the top leg.",alts:["plank"]},
+  bear:{n:"Bear Plank Hold",m:"core",k:"core",u:"sec",tgt:20,step:10,rest:30,
+    cue:"On hands and knees, lift your knees an inch off the floor, back flat as a tabletop. Hold and breathe.",
+    easier:"Hover 10 seconds, rest, repeat.",harder:"Tap alternate shoulders while holding.",alts:["plank"]},
+  climber:{n:"Slow Mountain Climbers",m:"core",k:"core",u:"sec",tgt:30,step:10,rest:30,
+    cue:"High plank, hands under shoulders. Bring one knee toward your chest, return, switch, at a steady controlled pace. Low impact, and it raises your heart rate.",
+    easier:"Hands on a counter or stair.",harder:"Pick up the pace, hips level.",alts:["bear"]}
 };
-var MUSCLE = {back:"Back",legs:"Legs & glutes",push:"Shoulders & chest",core:"Core"};
+var MUSCLE = {back:"Back & posture",legs:"Legs & glutes",push:"Chest & arms",core:"Core"};
 
 /* weekday templates (1=Mon … 5=Fri) */
 var DAYS = {
-  1:{t:"Back Strength A",f:"Thickness for the mid and upper back, plus deep core.",ex:["bb_row","inv_row","db_pullover","rdf","deadbug"]},
-  2:{t:"Legs & Glutes A",f:"Big lower-body work burns the most energy and keeps your posture strong.",ex:["squat","db_rdl","rev_lunge","plank"]},
-  3:{t:"Back & Shoulders B",f:"Lats, posture muscles and shoulders. Working toward an unassisted pull-up.",ex:["pullneg","chest_row","db_ohp","ytw","sideplank"]},
-  4:{t:"Posterior Chain",f:"Deadlifts build the whole back of the body, from heels to traps.",ex:["dl","hip_thrust","goblet","suitcase"]},
-  5:{t:"Full-Body Pull & Push",f:"Balanced upper body plus loaded carries to finish the week.",ex:["db_row","db_bench","stepup","farmer"]}
+  1:{t:"Back & Posture A",f:"Pulling and upper-back work for a strong, upright back.",ex:["door_row","towel_pd","snow","good_morning","deadbug"]},
+  2:{t:"Legs & Glutes",f:"Your largest muscles burn the most energy and support your lower back.",ex:["squat","rev_lunge","bridge","wallsit","sideplank"]},
+  3:{t:"Back & Posture B",f:"Shoulder blades, spinal muscles, and a little pushing for balance.",ex:["towel_row","ytw","superman","incline_pu","birddog"]},
+  4:{t:"Lower Body & Core",f:"Single-leg strength and a core finisher aimed at the waist.",ex:["split","sl_bridge","stepup","plank","climber"]},
+  5:{t:"Full-Body Circuit",f:"Move through these back to back with short rests to finish the week.",ex:["door_row","squat","swimmer","incline_pu","bear"]}
 };
 
-/* rep schemes per phase */
+/* sets per kind, reps added to each exercise's base range, level for timed holds */
 var SCHEME = {
-  foundation:{compound:{s:3,r:[8,10]},accessory:{s:2,r:[10,12]},core:{s:2},lvl:0},
-  build:     {compound:{s:3,r:[8,10]},accessory:{s:3,r:[10,12]},core:{s:3},lvl:1},
-  deload:    {compound:{s:2,r:[8,8]}, accessory:{s:2,r:[10,10]},core:{s:2},lvl:0},
-  strength:  {compound:{s:4,r:[5,6]}, accessory:{s:3,r:[8,10]}, core:{s:3},lvl:2},
-  test:      {compound:{s:3,r:[5,5]}, accessory:{s:2,r:[8,10]}, core:{s:2},lvl:2},
-  volume:    {compound:{s:3,r:[8,10]},accessory:{s:3,r:[10,12]},core:{s:3},lvl:2}
+  foundation:{main:2,acc:2,core:2,add:0,lvl:0},
+  build:     {main:3,acc:3,core:3,add:2,lvl:1},
+  deload:    {main:2,acc:2,core:2,add:0,lvl:0},
+  levelup:   {main:3,acc:3,core:3,add:4,lvl:2},
+  test:      {main:2,acc:2,core:2,add:0,lvl:2,max:true},
+  volume:    {main:3,acc:3,core:3,add:4,lvl:3}
 };
 
 /* ================= data: meals ================= */
@@ -428,7 +454,7 @@ var IC = {
 };
 
 /* ================= state ================= */
-var DEFAULTS={meta:{savedAt:null,v:1},settings:{name:"",startDate:"2026-11-16",kcal:1450,protein:115,goalWeight:122,goalWaist:null,swaps:{}},logs:{},body:{},meals:{}};
+var DEFAULTS={meta:{savedAt:null,v:1},settings:{name:"",startDate:"2026-11-16",kcal:1400,protein:110,goalWeight:122,goalWaist:null,swaps:{}},logs:{},body:{},meals:{}};
 var state;
 try{state=JSON.parse(document.getElementById("app-data").textContent);}catch(e){state=null;}
 function normalize(s){
@@ -438,15 +464,15 @@ function normalize(s){
   return s;
 }
 state=normalize(state);
-var LS="strongBrief_state_v1", localNewer=false;
+var LS="motion_state_v1", localNewer=false;
 try{
-  var loc=JSON.parse(localStorage.getItem(LS)||"null");
+  var loc=JSON.parse(localStorage.getItem(LS)||localStorage.getItem("strongBrief_state_v1")||"null");
   if(loc&&loc.meta&&loc.meta.savedAt&&(!state.meta.savedAt||loc.meta.savedAt>state.meta.savedAt)){state=normalize(loc);localNewer=true;}
 }catch(e){}
 
 /* per-view UI state survives the reload that follows a save */
-var ui={tab:"today",date:null,progEx:"bb_row",groc:false,confirmRestore:false};
-var SS="strongBrief_ui";
+var ui={tab:"today",date:null,progEx:"door_row",groc:false,confirmRestore:false};
+var SS="motion_ui";
 var drafts={};
 try{var su=JSON.parse(sessionStorage.getItem(SS)||"null");if(su){ui.tab=su.tab||ui.tab;ui.date=su.date||null;ui.progEx=su.progEx||ui.progEx;drafts=su.drafts||{};ui.scroll=su.scroll||0;}}catch(e){}
 if(!ui.date){var t=today();ui.date=t<state.settings.startDate?state.settings.startDate:t;}
@@ -459,30 +485,30 @@ function phaseOf(week){
   if(week<1)return {key:"foundation",name:"Pre-start",short:"Pre",pre:true};
   if(week<=2)return {key:"foundation",name:"Foundation",short:"Found."};
   if(week<=6)return {key:"build",name:"Build",short:"Build"};
-  if(week===7)return {key:"deload",name:"Deload",short:"Deload"};
-  if(week<=12)return {key:"strength",name:"Strength",short:"Strength"};
+  if(week===7)return {key:"deload",name:"Recover",short:"Recover"};
+  if(week<=12)return {key:"levelup",name:"Level Up",short:"Level Up"};
   if(week===13)return {key:"test",name:"Test & Review",short:"Test"};
   var c=Math.floor((week-14)/9)+2, w=(week-14)%9+1;
   if(w<=4)return {key:"volume",name:"Cycle "+c+" · Volume",short:"Vol",cycle:c};
-  if(w<=8)return {key:"strength",name:"Cycle "+c+" · Strength",short:"Strength",cycle:c};
-  return {key:"deload",name:"Cycle "+c+" · Deload",short:"Deload",cycle:c};
+  if(w<=8)return {key:"levelup",name:"Cycle "+c+" · Level Up",short:"Level Up",cycle:c};
+  return {key:"deload",name:"Cycle "+c+" · Recover",short:"Recover",cycle:c};
 }
 function phaseFor(s){return phaseOf(weekOf(s));}
 var PHASE_NOTE={
-  foundation:"Learn each movement. Pick weights that feel like a 6 out of 10 and focus on clean form.",
-  build:"Add a little weight whenever you hit the top of the rep range on every set.",
-  deload:"Lighter week on purpose. Use about 70% of your usual weights so your body can recover and come back stronger.",
-  strength:"Heavier weights, fewer reps. Rest the full time between sets of the big lifts.",
-  test:"Retest week. Work up to a hard set of 5 on rows, squats and deadlifts and compare with week 1.",
-  volume:"New cycle. More reps at moderate weight, building on everything from the first 90 days."
+  foundation:"Learn each movement. Choose the easier version if form slips, and stop 2 reps short of your limit.",
+  build:"A few more reps and longer holds each week. When you hit every target, try the harder version.",
+  deload:"Lighter week on purpose. Fewer sets so your body can recover and come back stronger.",
+  levelup:"Harder versions and slow, 3-second lowering. This is where the back gets strong.",
+  test:"Retest week. Do your last set of each exercise for as many good reps as you can, then compare with week 1.",
+  volume:"New cycle. Build on everything from the first 90 days with more reps and harder versions."
 };
 function slotKey(d,i){return d+":"+i;}
 function exFor(d,i){var sw=state.settings.swaps[slotKey(d,i)];return (sw&&EX[sw])?sw:DAYS[d].ex[i];}
 function targetFor(exId,s){
-  var ex=EX[exId], ph=phaseFor(s), sc=SCHEME[ph.key], k=sc[ex.k];
-  if(ex.k==="core"){var t=ex.tgt+ex.step*sc.lvl;return {sets:k.s,lo:t,hi:t,label:t+(ex.u==="sec"?" sec":" reps")};}
-  var r=ex.rr||k.r;
-  return {sets:k.s,lo:r[0],hi:r[1],label:(r[0]===r[1]?r[0]:r[0]+"–"+r[1])+" reps"};
+  var ex=EX[exId], ph=phaseFor(s), sc=SCHEME[ph.key], sets=sc[ex.k];
+  if(ex.tgt!=null){var t=ex.tgt+ex.step*sc.lvl;return {sets:sets,lo:t,hi:t,label:t+(ex.u==="sec"?" sec":" reps")};}
+  var lo=ex.rr[0]+sc.add, hi=ex.rr[1]+sc.add;
+  return {sets:sets,lo:lo,hi:hi,label:lo+"–"+hi+" reps"+(sc.max?", last set max":"")};
 }
 function sortedLogDates(){return Object.keys(state.logs).sort();}
 function lastTime(exId,before,skipDeload){
@@ -497,75 +523,35 @@ function lastTime(exId,before,skipDeload){
 }
 function suggest(exId,s){
   var ex=EX[exId], tg=targetFor(exId,s), ph=phaseFor(s);
-  var lt=lastTime(exId,s,ph.key!=="deload");
-  if(!lt)return {w:ex.start,note:ex.bw?(ex.start?"":"Bodyweight"):"Starting point. Adjust so the last 2 reps feel hard.",fresh:true};
-  var topW=Math.max.apply(null,lt.sets.map(function(x){return +x.w||0;}));
-  if(ex.bw&&topW===0){
-    var hitBw=lt.sets.every(function(x){return x.r>=(lt.top||tg.hi);});
-    return {w:0,note:hitBw&&ex.k!=="core"?"You hit every rep last time. Make it a little harder.":"",up:hitBw&&ex.k!=="core"};
-  }
-  if(ex.k==="core"||!ex.inc)return {w:topW,note:""};
-  if(ph.key==="deload")return {w:roundTo(topW*0.7,ex.inc),note:"Deload: about 70% of your usual weight"};
-  var hit=lt.sets.length>=1&&lt.sets.every(function(x){return x.r>=(lt.top||tg.hi);});
-  if(!lt.top||lt.top===tg.hi){
-    if(hit)return {w:topW+ex.inc,note:"Every rep hit last time. Add "+ex.inc+" lb.",up:true};
-    return {w:topW,note:"Same weight. Try to beat last time's reps."};
-  }
-  var best=Math.max.apply(null,lt.sets.map(function(x){return e1rm(+x.w||0,+x.r||0);}));
-  return {w:roundTo(best/(1+tg.hi/30),ex.inc),note:"New rep range, so the weight is adjusted."};
+  if(ph.key==="deload")return {note:"Recovery week: easy effort, perfect form."};
+  var lt=lastTime(exId,s,true);
+  if(!lt)return {note:"First time: choose the version where the last 2 reps feel hard but clean.",fresh:true};
+  var hit=lt.sets.every(function(x){return (+x.r||0)>=(lt.top||tg.hi);});
+  var best=Math.max.apply(null,lt.sets.map(function(x){return +x.r||0;}));
+  if(hit)return {note:"You hit every target last time. Level up: "+ex.harder,up:true};
+  return {note:"Last best: "+best+(ex.u==="sec"?" sec":" reps")+". Try to beat it."};
 }
 function dayLog(s,create){if(!state.logs[s]&&create)state.logs[s]={ex:{},done:false};return state.logs[s];}
 function plannedCount(s){var d=dow(s);if(d<1||d>5)return 0;var n=0;DAYS[d].ex.forEach(function(_,i){n+=targetFor(exFor(d,i),s).sets;});return n;}
 function setsDone(s){var L=state.logs[s];if(!L||!L.ex)return 0;var n=0;for(var k in L.ex){(L.ex[k].sets||[]).forEach(function(x){if(x&&x.d)n++;});}return n;}
 function isDone(s){var L=state.logs[s];if(!L)return false;if(L.done)return true;var p=plannedCount(s);return p>0&&setsDone(s)>=p;}
 
-/* ================= persistence ================= */
-var artifactNS=null, sync="pending", saveTimer=null, dirty=false;
-var RESET=':root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}';
-var FONTS='<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">';
-function buildHTML(){
-  var css=document.getElementById("app-style").textContent;
-  var js=document.getElementById("app-js").textContent;
-  var json=JSON.stringify(state).replace(/</g,"\\u003c");
-  var C="</"+"script>";
-  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+RESET+'</style></head><body>\n'+
-    '<title>Strong Brief</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n'+FONTS+'\n<style id="app-style">'+css+'</style>\n<div id="root"></div>\n'+
-    '<script id="app-data" type="application/json">'+json+C+'\n<script id="app-js">'+js+C+'\n</body></html>';
-}
-function persistLocal(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
-function changed(delay){
-  state.meta.savedAt=new Date().toISOString();
-  persistLocal(); dirty=true;
-  if(!artifactNS)return;
-  clearTimeout(saveTimer);
-  sync="busy"; paintSync();
-  saveTimer=setTimeout(publishNow,delay==null?6000:delay);
-}
-function publishNow(){
-  clearTimeout(saveTimer);
-  if(!artifactNS||!dirty)return;
-  dirty=false; stashUI();
-  artifactNS.publish(buildHTML()).then(function(){ /* the view reloads to the new version */ })
-  .catch(function(err){
-    var c=err&&err.code;
-    if(c==="not_writer"||c==="not_granted"||c==="consent_required"||c==="not_declared"||c==="capability_disabled"||c==="capability_removed"){artifactNS=null;sync="local";}
-    else if(c==="conflict"){/* a newer version is loading */}
-    else {sync="local";}
-    paintSync();
-  });
-}
+/* ================= persistence: this device only ================= */
+var storageOK=true;
+try{localStorage.setItem("__mg_test","1");localStorage.removeItem("__mg_test");}catch(e){storageOK=false;}
+function persistLocal(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){storageOK=false;}}
+function changed(){state.meta.savedAt=new Date().toISOString();persistLocal();paintSync();}
 function paintSync(){
   var el=document.getElementById("sync");if(!el)return;
-  var map={ok:["ok","Synced"],busy:["busy","Saving…"],local:["","Saved on this device"],pending:["",""]};
-  var m=map[sync]||map.pending;
-  el.innerHTML=m[1]?'<span class="dot '+m[0]+'"></span>'+m[1]:"";
+  el.innerHTML=storageOK?'<span class="dot ok"></span>Saved on this device':'<span class="dot ro"></span>Not saving';
 }
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden"){if(dirty&&artifactNS)publishNow();stashUI();}});
+function lastBackup(){try{return localStorage.getItem(LS+"_backup")||"";}catch(e){return "";}}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden")stashUI();});
 
 /* ================= rendering ================= */
 var root=document.getElementById("root");
 function render(){
-  root.innerHTML=topHTML()+viewHTML()+dockHTML()+'<div id="timer-slot"></div><div id="toast-slot"></div>';
+  root.innerHTML=topHTML()+(storageOK?'':'<div class="card" style="margin-bottom:12px;border-color:var(--crit)"><b>This browser isn\'t letting the app save.</b> <span class="prose">Private or incognito windows block storage. Open the link in a normal browser window.</span></div>')+viewHTML()+dockHTML()+'<div id="timer-slot"></div><div id="toast-slot"></div>';
   paintSync(); paintTimer();
 }
 function topHTML(){
@@ -574,7 +560,7 @@ function topHTML(){
   if(idx<0)sub="90-day plan starts "+fmtS(state.settings.startDate);
   else if(idx<90)sub=nm+" 90-day plan · Day "+(idx+1);
   else sub=nm+" plan · Day "+(idx+1)+" · beyond 90";
-  return '<header class="top"><div class="brand"><b>Strong <span>Brief</span></b><small>'+sub+'</small></div><div class="sync" id="sync" aria-live="polite"></div></header>';
+  return '<header class="top"><div class="brand"><b><span>Motion</span></b><small>'+sub+'</small></div><div class="sync" id="sync" aria-live="polite"></div></header>';
 }
 function dockHTML(){
   function b(id,ic,l){return '<button class="tab'+(ui.tab===id?' on':'')+'" data-a="tab" data-v="'+id+'" aria-label="'+l+'">'+icon(ic)+'<span>'+l+'</span></button>';}
@@ -611,7 +597,7 @@ function todayHTML(){
      '<div class="chips"><span class="chip">About 30 min</span><span class="chip">'+n+' exercises</span><span class="chip ph">'+(ph.pre?"Foundation":ph.name)+'</span></div></div>';
   h+='<div class="stack">';
   if(isDone(s))h+=wonHTML(s);
-  h+='<div class="card"><details class="warm"><summary>5-minute warm-up</summary><ol><li>1 min marching or jumping jacks</li><li>10 arm circles each way + 10 band pull-aparts (or reach-backs)</li><li>10 bodyweight squats</li><li>10 hip hinges (hands on hips, push hips back)</li><li>5 cat-cows, then one light set of the first exercise</li></ol></details>'+
+  h+='<div class="card"><details class="warm"><summary>5-minute warm-up</summary><ol><li>1 min marching or jumping jacks</li><li>10 arm circles each way + 10 reach-backs (squeeze shoulder blades)</li><li>10 bodyweight squats</li><li>10 hip hinges (hands on hips, push hips back)</li><li>5 cat-cows, then an easy set of the first exercise</li></ol></details>'+
      '<p class="note" style="margin-top:6px">'+PHASE_NOTE[ph.key]+' To stay inside 30 minutes, pair the last two exercises back to back.</p></div>';
   for(var i=0;i<n;i++)h+=exCard(s,d,i);
   h+='</div>';
@@ -628,27 +614,22 @@ function exCard(s,d,i){
   var L=state.logs[s], E=L&&L.ex&&L.ex[exId];
   var nSets=Math.max(tg.sets,(E&&E.sets?E.sets.length:0));
   var allDone=E&&E.sets&&E.sets.filter(function(x){return x&&x.d;}).length>=tg.sets;
-  var lt=lastTime(exId,s,false);
+  var lt=lastTime(exId,s,false), unit=ex.u==="sec"?"sec":"reps";
   var h='<div class="card ex'+(allDone?' done':'')+'" id="card-'+exId+'"><div class="exh"><div style="min-width:0"><h3>'+esc(ex.n)+'</h3><div class="exmeta">'+
     '<span><span class="mdot" style="background:var(--m-'+ex.m+')"></span>'+MUSCLE[ex.m]+'</span><span class="num">'+tg.sets+' × '+tg.label+'</span><span>Rest '+ex.rest+'s</span></div></div>';
   var opts=[DAYS[d].ex[i]].concat(EX[DAYS[d].ex[i]].alts);
   h+='<select class="swap" data-f="swap" data-slot="'+slotKey(d,i)+'" id="swap-'+d+'-'+i+'" aria-label="Swap exercise">';
   opts.forEach(function(o,j){h+='<option value="'+o+'"'+(o===exId?' selected':'')+'>'+(j===0?"Planned":"Swap")+': '+esc(EX[o].n.replace(/ \(per .*\)/,""))+'</option>';});
   h+='</select></div>';
-  if(lt){
-    h+='<div class="last"><span>Last time</span><span class="num">'+lt.sets.map(function(x){return (x.w?f1(x.w)+"×":"")+x.r;}).join("  ")+'</span><span class="when">'+fmtS(lt.date)+'</span></div>';
-  }
-  if(sg.note)h+='<div class="hint'+(sg.up?' up':'')+'">'+(sg.w&&!ex.bw||sg.w&&ex.k==="core"?'<span class="num">'+f1(sg.w)+' lb</span> · ':'')+esc(sg.note)+'</div>';
-  h+='<details class="how" style="margin-top:8px"><summary>How to do it</summary><p>'+esc(ex.cue)+'</p></details>';
+  if(lt)h+='<div class="last"><span>Last time</span><span class="num">'+lt.sets.map(function(x){return x.r;}).join(" · ")+' '+unit+'</span><span class="when">'+fmtS(lt.date)+'</span></div>';
+  if(sg.note)h+='<div class="hint'+(sg.up?' up':'')+'">'+esc(sg.note)+'</div>';
+  h+='<details class="how" style="margin-top:8px"><summary>How to do it</summary><p>'+esc(ex.cue)+'</p><p><b>Easier:</b> '+esc(ex.easier)+'<br><b>Harder:</b> '+esc(ex.harder)+'</p></details>';
   h+='<div class="sets">';
-  var wl=ex.bw?"+lb":"lb", rl=ex.u==="sec"?"sec":"reps";
   for(var j=0;j<nSets;j++){
     var st=E&&E.sets&&E.sets[j], k=s+"|"+exId+"|"+j;
-    var wv=st?st.w:(drafts[k+"|w"]!=null?drafts[k+"|w"]:""), rv=st?st.r:(drafts[k+"|r"]!=null?drafts[k+"|r"]:"");
-    var wph=ex.bw&&!sg.w?"0":f1(sg.w), rph=tg.hi;
+    var rv=st&&st.d?st.r:(drafts[k+"|r"]!=null?drafts[k+"|r"]:"");
     h+='<div class="srow"><span class="n">'+(j+1)+'</span>'+
-      '<div class="fld"><label for="w-'+exId+'-'+j+'">'+wl+'</label><input id="w-'+exId+'-'+j+'" inputmode="decimal" data-f="set" data-ex="'+exId+'" data-i="'+j+'" data-k="w" value="'+esc(wv)+'" placeholder="'+wph+'"></div>'+
-      '<div class="fld"><label for="r-'+exId+'-'+j+'">'+rl+'</label><input id="r-'+exId+'-'+j+'" inputmode="numeric" data-f="set" data-ex="'+exId+'" data-i="'+j+'" data-k="r" value="'+esc(rv)+'" placeholder="'+rph+'"></div>'+
+      '<div class="fld"><label for="r-'+exId+'-'+j+'">'+unit+'</label><input id="r-'+exId+'-'+j+'" inputmode="numeric" data-f="set" data-ex="'+exId+'" data-i="'+j+'" data-k="r" value="'+esc(rv)+'" placeholder="'+tg.hi+'"></div>'+
       '<button class="chk'+(st&&st.d?' on':'')+'" data-a="set" data-ex="'+exId+'" data-i="'+j+'" data-top="'+tg.hi+'" data-rest="'+ex.rest+'" aria-label="Set '+(j+1)+' done">'+icon(IC.check)+'</button></div>';
   }
   h+='</div><button class="addset" data-a="addset" data-ex="'+exId+'">+ Add a set</button></div>';
@@ -661,7 +642,7 @@ function restDayHTML(s){
     '<li><span class="tick">1</span><div><b>Walk 30–45 minutes</b> (about 8,000 steps). Daily steps matter as much as workouts for losing waist fat.</div></li>'+
     '<li><span class="tick">2</span><div><b>10 minutes of mobility</b>: hip flexor stretch, thoracic rotations, child\'s pose, doorway chest stretch.</div></li>'+
     '<li><span class="tick">3</span><div><b>Weigh in</b> first thing in the morning on the Body tab'+(sun?'':' (optional on weekends)')+'.</div></li>'+
-    (sun?'<li><span class="tick">4</span><div><b>Meal prep, 60–90 minutes.</b> The checklist is on the Meals tab. This is what makes busy weekdays work.</div></li>':'')+
+    (sun?'<li><span class="tick">4</span><div><b>Meal prep, 60–90 minutes.</b> The checklist is on the Meals tab. This is what makes busy weekdays work.</div></li><li><span class="tick">5</span><div><b>Copy a backup</b> from the Plan tab. Your data lives only on this device.</div></li>':'')+
     '</ul>'+(sun?'<button class="btn pri" style="margin-top:14px" data-a="tab" data-v="meals">Open meal prep</button>':'')+'</div>';
   if(idx<0)h+='<div class="card" style="margin-top:12px"><p class="prose" style="margin:0">The program starts <b>'+fmtL(state.settings.startDate)+'</b>. Use the weekend to shop with the grocery list on the Meals tab and do your first prep.</p></div>';
   return h;
@@ -794,25 +775,24 @@ function progressHTML(){
   h+='</div><p class="note">Weeks 1–13 cover the 90 days. New weeks appear automatically after that.</p></div>';
   /* lift chart */
   var logged={};sortedLogDates().forEach(function(d){var ex=state.logs[d].ex||{};for(var k in ex)if((ex[k].sets||[]).some(function(x){return x&&x.d;}))logged[k]=1;});
-  var keys=["bb_row","dl","squat","inv_row","pullneg","db_row","chest_row","hip_thrust"];Object.keys(logged).forEach(function(k){if(keys.indexOf(k)<0)keys.push(k);});
-  if(!EX[ui.progEx])ui.progEx="bb_row";
+  var keys=["door_row","squat","incline_pu","plank","superman","split","towel_pd","sideplank"];Object.keys(logged).forEach(function(k){if(keys.indexOf(k)<0)keys.push(k);});
+  if(!EX[ui.progEx])ui.progEx="door_row";
   h+='<div class="sec-title">Strength progress</div><div class="card"><select class="pick" data-f="progex" id="prog-ex" aria-label="Choose exercise">';
   keys.forEach(function(k){h+='<option value="'+k+'"'+(k===ui.progEx?' selected':'')+'>'+esc(EX[k].n)+(logged[k]?'':' (not logged yet)')+'</option>';});
   h+='</select>'+liftHTML(ui.progEx)+'</div>';
   return h;
 }
 function liftHTML(exId){
-  var ex=EX[exId], rows=[];
+  var ex=EX[exId], rows=[], unit=ex.u==="sec"?"sec":"reps";
   sortedLogDates().forEach(function(d){var e=state.logs[d].ex&&state.logs[d].ex[exId];if(!e)return;var ss=(e.sets||[]).filter(function(x){return x&&x.d;});if(!ss.length)return;
-    var top=ss.reduce(function(a,b){return (ex.bw&&!(+b.w)||ex.u==="sec")?(b.r>a.r?b:a):(e1rm(+b.w,+b.r)>e1rm(+a.w,+a.r)?b:a);});rows.push({d:d,ss:ss,top:top});});
-  var byReps=ex.u==="sec"||(ex.bw&&rows.every(function(r){return !(+r.top.w);}));
-  var pts=rows.map(function(r){return {x:r.d,y:byReps?+r.top.r:+r.top.w};});
+    var best=Math.max.apply(null,ss.map(function(x){return +x.r||0;})), tot=ss.reduce(function(a,x){return a+(+x.r||0);},0);rows.push({d:d,ss:ss,best:best,tot:tot});});
+  var pts=rows.map(function(r){return {x:r.d,y:r.best};});
   var h='<div style="margin-top:10px">'+lineChart({label:ex.n+" progress",empty:"Log "+ex.n+" to see your progress here.",series:[{pts:pts,color:"var(--m-"+ex.m+")",line:true,dots:true,end:true}]})+'</div>';
   if(rows.length){
     var first=pts[0].y,last=pts[pts.length-1].y;
-    h+='<p class="note">Best set '+(byReps?(ex.u==="sec"?"hold (sec)":"reps"):"weight (lb)")+': '+f1(first)+' → '+f1(last)+(last>first?' <b style="color:var(--good)">+'+f1(last-first)+'</b>':'')+'</p>';
-    h+='<div class="scroll"><table class="tbl"><thead><tr><th>Date</th><th>Sets</th>'+(byReps?'':'<th>Est. max</th>')+'</tr></thead><tbody>';
-    rows.slice().reverse().forEach(function(r){h+='<tr><td>'+fmtS(r.d)+'</td><td>'+r.ss.map(function(x){return (+x.w?f1(x.w)+"×":"")+x.r;}).join(", ")+'</td>'+(byReps?'':'<td>'+f1(e1rm(+r.top.w,+r.top.r))+'</td>')+'</tr>';});
+    h+='<p class="note">Best set ('+unit+'): '+first+' → '+last+(last>first?' <b style="color:var(--good)">+'+(last-first)+'</b>':'')+'</p>';
+    h+='<div class="scroll"><table class="tbl"><thead><tr><th>Date</th><th>Sets ('+unit+')</th><th>Total</th></tr></thead><tbody>';
+    rows.slice().reverse().forEach(function(r){h+='<tr><td>'+fmtS(r.d)+'</td><td>'+r.ss.map(function(x){return x.r;}).join(", ")+'</td><td>'+r.tot+'</td></tr>';});
     h+='</tbody></table></div>';
   }
   return h;
@@ -820,30 +800,27 @@ function liftHTML(exId){
 
 /* ---------- plan ---------- */
 function planHTML(){
-  var S=state.settings, t=today(), cw=weekOf(t);
-  var h='<div class="shead"><div class="eyebrow">The brief</div><h1>Stronger back, smaller waist</h1><p>Five 30-minute home sessions a week, Monday to Friday, with a squat rack, barbell, bench and dumbbells. Paired with a high-protein meal plan built for long workdays.</p></div>';
-  /* phases */
-  var segs=[["Found.",2,1],["Build",4,3],["DL",1,7],["Strength",5,8],["Test",1,13]];
+  var S=state.settings, t=today(), cw=weekOf(t), lb=lastBackup();
+  var h='<div class="shead"><div class="eyebrow">The plan</div><h1>Stronger back, smaller waist</h1><p>Five 30-minute sessions a week, Monday to Friday, with no equipment. You need a floor, a wall, a doorframe, a bath towel and a stair. Paired with a high-protein meal plan built for long workdays.</p></div>';
+  var segs=[["Found.",2,1],["Build",4,3],["Rec.",1,7],["Level Up",5,8],["Test",1,13]];
   h+='<div class="card"><div class="eyebrow">13 weeks ≈ 90 days · '+fmtS(S.startDate)+' to '+fmtS(addDays(S.startDate,89))+'</div><div class="phases">';
   segs.forEach(function(sg){var cur=cw>=sg[2]&&cw<sg[2]+sg[1];h+='<div class="'+(cur?'cur':'')+'" style="flex:'+sg[1]+'">'+sg[0]+'</div>';});
+  function row(a,b,c){return '<div><b>'+a+'</b><span><b style="font-family:inherit">'+b+'</b> '+c+'</span></div>';}
   h+='</div><div class="phleg">'+
-    '<div><b>Wk 1–2</b><span><b style="font-family:inherit">Foundation.</b> Learn the lifts, light weights, 2–3 sets.</span></div>'+
-    '<div><b>Wk 3–6</b><span><b style="font-family:inherit">Build.</b> 3 sets of 8–12. Add weight when you hit the top of the range.</span></div>'+
-    '<div><b>Wk 7</b><span><b style="font-family:inherit">Deload.</b> 70% weights. Recover before the heavy block.</span></div>'+
-    '<div><b>Wk 8–12</b><span><b style="font-family:inherit">Strength.</b> 4 sets of 5–6 on the big lifts. This is where the back gets strong.</span></div>'+
-    '<div><b>Wk 13</b><span><b style="font-family:inherit">Test & review.</b> Retest lifts, waist and photos; compare with week 1.</span></div>'+
-    '<div><b>Day 91+</b><span><b style="font-family:inherit">Keep going.</b> The app rolls into repeating 9-week cycles (4 volume, 4 strength, 1 deload). All history carries over.</span></div>'+
+    row("Wk 1–2","Foundation.","Learn each move, 2 sets, easy versions.")+
+    row("Wk 3–6","Build.","3 sets, more reps and longer holds each week.")+
+    row("Wk 7","Recover.","Fewer sets on purpose so your body catches up.")+
+    row("Wk 8–12","Level up.","Harder versions, slower lowering, longer holds. Most of the back strength comes here.")+
+    row("Wk 13","Test & review.","Max reps on the last set, then compare waist, weight and photos with week 1.")+
+    row("Day 91+","Keep going.","The app moves into repeating 9-week cycles. All history carries over.")+
     '</div></div>';
-  /* split */
   h+='<div class="sec-title">Weekly split <small>Tap a day to see exercises</small></div><div class="card split">';
   for(var d=1;d<=5;d++){h+='<details><summary><b>'+DOW[d].toUpperCase()+'</b><span>'+DAYS[d].t+'</span></summary><ul>'+DAYS[d].ex.map(function(_,i){return '<li>'+esc(EX[exFor(d,i)].n)+'</li>';}).join("")+'</ul></details>';}
   h+='<details><summary><b>S/S</b><span>Walk, mobility, Sunday meal prep</span></summary></details></div>';
-  /* nutrition */
   h+='<div class="sec-title">Nutrition targets</div><div class="card prose">'+
-    '<p><b>'+S.kcal+' kcal and '+S.protein+' g protein a day.</b> At 5\'2" and 128 lb with a desk job plus five workouts, maintenance is roughly 1,750–1,850 kcal. A 300–400 kcal deficit loses about ½ lb a week while you build muscle, which is the combination that shrinks a waist.</p>'+
-    '<ul><li>Protein at every meal (about 30 g). It keeps you full and protects muscle.</li><li>Eat breakfast within an hour after the morning workout.</li><li>Fill half the plate with vegetables at lunch and dinner.</li><li>Water: about 80 oz a day. Alcohol: 2–3 drinks a week at most; it goes straight to the midsection.</li><li>Sleep 7+ hours. Short sleep raises cortisol and appetite.</li></ul>'+
-    '<p class="note">If weight hasn\'t moved in 3 weeks, drop 100 kcal. If you feel run-down or workouts stall, add 100. Spot reduction isn\'t real: core work strengthens the waist, and the overall deficit is what makes it smaller.</p></div>';
-  /* settings */
+    '<p><b>'+S.kcal+' kcal and '+S.protein+' g protein a day.</b> At 45, 5\'2" and 128 lb with a desk job plus daily workouts, maintenance is about 1,700–1,750 kcal. A 300–350 kcal deficit loses roughly ½ lb a week while keeping muscle, which is what shrinks a waist.</p>'+
+    '<ul><li>About 30 g of protein at every meal. After 40 the body needs more protein to hold on to muscle.</li><li>Eat breakfast within an hour after the morning workout.</li><li>Fill half of lunch and dinner with vegetables, and aim for 25 g of fiber a day.</li><li>Water: about 80 oz a day. Alcohol: 2–3 drinks a week at most; it tends to settle at the waist.</li><li>Sleep 7+ hours. Poor sleep raises cortisol and appetite, and both work against waist loss in your 40s.</li></ul>'+
+    '<p class="note">If weight hasn\'t moved in 3 weeks, drop 100 kcal. If you feel run-down, add 100. Spot reduction isn\'t real: core work strengthens the waist, and the overall deficit is what makes it smaller.</p></div>';
   h+='<div class="sec-title">Settings</div><div class="card"><div class="form">'+
     '<label class="full" for="set-name">Name<input id="set-name" value="'+esc(S.name)+'" placeholder="Shown in the header"></label>'+
     '<label for="set-start">Program start (a Monday)<input id="set-start" type="date" value="'+S.startDate+'"></label>'+
@@ -853,8 +830,7 @@ function planHTML(){
     '<label for="set-gwa">Goal waist (in)<input id="set-gwa" inputmode="decimal" value="'+(S.goalWaist||"")+'" placeholder="start − 2"></label>'+
     '</div><button class="btn pri" style="margin-top:14px" data-a="savesettings">Save settings</button>'+
     (Object.keys(S.swaps).length?' <button class="btn ghost" style="margin-top:14px" data-a="resetswaps">Reset exercise swaps</button>':'')+'</div>';
-  /* backup */
-  h+='<div class="sec-title">Backup</div><div class="card"><p class="prose" style="margin:0 0 10px">Copy everything (workouts, weigh-ins, meals) as text you can paste into an email or note. Paste it back here to restore.</p>'+
+  h+='<div class="sec-title">Your data <small>Last backup: '+(lb?fmtS(lb):"never")+'</small></div><div class="card"><p class="prose" style="margin:0 0 10px">Everything you log stays in this browser on this device. Nothing is sent anywhere. Clearing your browser data or switching devices starts fresh, so copy a backup every week or so and paste it into a note or an email to yourself. To move to a new device, paste it below.</p>'+
     '<button class="btn ghost sm" data-a="copybk">Copy backup</button><textarea class="bk" id="bk" style="margin-top:10px" placeholder="Paste a backup here to restore"></textarea>'+
     '<button class="btn '+(ui.confirmRestore?'crit':'ghost')+' sm" style="margin-top:8px" data-a="restore">'+(ui.confirmRestore?'Tap again to replace all data':'Restore from backup')+'</button></div>';
   h+='<p class="note" style="margin-top:18px">General fitness and nutrition guidance, not medical advice. Check with a doctor before starting if you have injuries or health conditions. Stop any exercise that causes sharp pain.</p>';
@@ -863,9 +839,9 @@ function planHTML(){
 
 /* ================= timer & toast ================= */
 var restEnd=0, timerInt=null;
-try{restEnd=+sessionStorage.getItem("strongBrief_rest")||0;}catch(e){}
-function startRest(sec){restEnd=Date.now()+sec*1000;try{sessionStorage.setItem("strongBrief_rest",String(restEnd));}catch(e){}paintTimer();}
-function stopRest(){restEnd=0;try{sessionStorage.removeItem("strongBrief_rest");}catch(e){}paintTimer();}
+try{restEnd=+sessionStorage.getItem("motion_rest")||0;}catch(e){}
+function startRest(sec){restEnd=Date.now()+sec*1000;try{sessionStorage.setItem("motion_rest",String(restEnd));}catch(e){}paintTimer();}
+function stopRest(){restEnd=0;try{sessionStorage.removeItem("motion_rest");}catch(e){}paintTimer();}
 function paintTimer(){
   var slot=document.getElementById("timer-slot");if(!slot)return;
   clearInterval(timerInt);
@@ -891,18 +867,18 @@ root.addEventListener("click",function(ev){
     var st=E.sets[i];
     if(st&&st.d){st.d=false;}
     else{
-      var w=readNum("w-"+ex+"-"+i), r=readNum("r-"+ex+"-"+i);
-      E.sets[i]={w:w||0,r:r||0,d:true};
-      delete drafts[ui.date+"|"+ex+"|"+i+"|w"];delete drafts[ui.date+"|"+ex+"|"+i+"|r"];
+      var r=readNum("r-"+ex+"-"+i);
+      E.sets[i]={r:r||0,d:true};
+      delete drafts[ui.date+"|"+ex+"|"+i+"|r"];
       startRest(+b.getAttribute("data-rest")||60);
     }
-    for(var q=0;q<E.sets.length;q++)if(!E.sets[q])E.sets[q]={w:0,r:0,d:false};
+    for(var q=0;q<E.sets.length;q++)if(!E.sets[q])E.sets[q]={r:0,d:false};
     var y=window.scrollY; render(); window.scrollTo(0,y);
     if(isDone(ui.date))toast("Workout complete. Nice work.");
     changed(); return;
   }
   if(a==="addset"){var ex2=b.getAttribute("data-ex"),L2=dayLog(ui.date,true),E2=L2.ex[ex2]=L2.ex[ex2]||{sets:[]};
-    var tgN=targetFor(ex2,ui.date).sets;while(E2.sets.length<tgN)E2.sets.push({w:0,r:0,d:false});E2.sets.push({w:0,r:0,d:false});
+    var tgN=targetFor(ex2,ui.date).sets;while(E2.sets.length<tgN)E2.sets.push({r:0,d:false});E2.sets.push({r:0,d:false});
     var y2=window.scrollY;render();window.scrollTo(0,y2);changed();return;}
   if(a==="finish"){dayLog(ui.date,true).done=true;render();window.scrollTo(0,0);toast("Workout logged");changed(1500);return;}
   if(a==="unfinish"){var L3=state.logs[ui.date];if(L3)L3.done=false;render();changed();return;}
@@ -928,14 +904,14 @@ root.addEventListener("click",function(ev){
   if(a==="resetswaps"){state.settings.swaps={};render();toast("Exercises reset to the plan");changed(1500);return;}
   if(a==="copybk"){
     var txt=JSON.stringify(state), ta=document.getElementById("bk");
-    var ok=function(){toast("Backup copied");}, fb=function(){ta.value=txt;ta.focus();ta.select();toast("Select all and copy");};
+    var ok=function(){try{localStorage.setItem(LS+"_backup",today());}catch(e){}toast("Backup copied");render();}, fb=function(){ta.value=txt;ta.focus();ta.select();toast("Select all and copy");};
     try{navigator.clipboard.writeText(txt).then(ok,fb);}catch(e){fb();}
     return;
   }
   if(a==="restore"){
     var raw=document.getElementById("bk").value.trim(), parsed=null;
     try{parsed=JSON.parse(raw);}catch(e){}
-    if(!parsed||!parsed.settings||!parsed.logs){toast("That doesn't look like a Strong Brief backup");return;}
+    if(!parsed||!parsed.settings||!parsed.logs){toast("That doesn't look like a Motion backup");return;}
     if(!ui.confirmRestore){ui.confirmRestore=true;var keep=raw;render();document.getElementById("bk").value=keep;return;}
     ui.confirmRestore=false;state=normalize(parsed);render();toast("Backup restored");changed(1000);return;
   }
@@ -966,13 +942,5 @@ root.addEventListener("change",function(ev){
 /* ================= boot ================= */
 render();
 if(ui.scroll)setTimeout(function(){window.scrollTo(0,ui.scroll);},30);
-(function connect(tries){
-  if(!window.claude||!window.claude.use){if(tries<6){setTimeout(function(){connect(tries+1);},500);return;}sync="local";paintSync();return;}
-  window.claude.use("artifact").then(function(ns){
-    if(!ns){sync="local";paintSync();return;}
-    artifactNS=ns; sync="ok"; paintSync();
-    if(dirty||localNewer)changed(2000);
-  }).catch(function(){sync="local";paintSync();});
-})(0);
 })();
 </script>
